@@ -1,0 +1,50 @@
+node_modules
+# dependencies
+/node_modules
+
+# next.js
+/.next
+/out
+
+# production
+/build
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# prisma
+prisma/dev.db
+prisma/dev.db-journal
+
+# macOS
+.DS_Store
+
+# vscode
+.vscode/
+
+# turbo
+.turbo/
+
+# coverage
+coverage/
+
+# vercel
+.vercel/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+*.pem
+*.key
