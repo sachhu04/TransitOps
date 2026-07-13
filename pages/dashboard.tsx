@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { 
-  Truck, 
-  Route, 
-  AlertTriangle, 
-  TrendingUp, 
+import {
+  Truck,
+  Route,
+  AlertTriangle,
+  TrendingUp,
   Wrench,
   Clock,
   CheckCircle2,
@@ -35,13 +35,13 @@ import { exportToPDF } from "@/utils/pdfExport";
 import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(res => res.json());
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as RechartsTooltip, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
   LineChart,
@@ -66,7 +66,7 @@ export default function Dashboard() {
   const { data: tripsData, error: tripsError } = useSWR('/api/trips', fetcher);
 
   const recentTrips = Array.isArray(tripsData) ? tripsData.slice(0, 5) : [];
-  
+
   const revenueData = [
     { name: "Mon", revenue: 12400, cost: 8400 },
     { name: "Tue", revenue: 14500, cost: 9200 },
@@ -78,7 +78,7 @@ export default function Dashboard() {
   ];
 
   const exportCSV = () => {
-    const csvContent = "data:text/csv;charset=utf-8," + 
+    const csvContent = "data:text/csv;charset=utf-8," +
       "Metric,Value\n" +
       `Active Vehicles,${dashboardData?.activeVehicles + dashboardData?.availableVehicles || 0}\n` +
       `Active Trips,${dashboardData?.activeTrips || 0}\n` +
@@ -110,7 +110,7 @@ export default function Dashboard() {
       <Head>
         <title>Dashboard | TransitOps</title>
       </Head>
-      
+
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -202,7 +202,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </motion.div>
-          
+
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
             <Card className="border-t-4 border-t-success">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -299,21 +299,21 @@ export default function Dashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={revenueData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="#888888" 
-                      fontSize={12} 
-                      tickLine={false} 
-                      axisLine={false} 
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
                     />
-                    <YAxis 
-                      stroke="#888888" 
-                      fontSize={12} 
-                      tickLine={false} 
-                      axisLine={false} 
-                      tickFormatter={(value) => `₹${value}`} 
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `₹${value}`}
                     />
-                    <RechartsTooltip 
+                    <RechartsTooltip
                       cursor={{ fill: 'transparent' }}
                       contentStyle={{ borderRadius: '10px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     />
@@ -355,22 +355,22 @@ export default function Dashboard() {
                         <td className="px-4 py-3">{trip.vehicle?.registration || trip.vehicleId}</td>
                         <td className="px-4 py-3">{trip.driver?.name || '—'}</td>
                         <td className="px-4 py-3">
-                          <Badge 
+                          <Badge
                             variant="secondary"
                             className={
                               trip.status === "COMPLETED" ? "bg-success/10 text-success" :
-                              trip.status === "DISPATCHED" ? "bg-info/10 text-info" :
-                              trip.status === "ASSIGNED" ? "bg-warning/10 text-warning" :
-                              "bg-muted text-muted-foreground"
+                                trip.status === "DISPATCHED" ? "bg-info/10 text-info" :
+                                  trip.status === "ASSIGNED" ? "bg-warning/10 text-warning" :
+                                    "bg-muted text-muted-foreground"
                             }
                           >
                             {trip.status}
                           </Badge>
                         </td>
                         <td className="px-4 py-3">
-                          {trip.status === "COMPLETED" ? "—" : 
-                           trip.status === "DRAFT" ? "Awaiting vehicle" : 
-                           trip.estimatedArrival ? new Date(trip.estimatedArrival).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : "—"}
+                          {trip.status === "COMPLETED" ? "—" :
+                            trip.status === "DRAFT" ? "Awaiting vehicle" :
+                              trip.estimatedArrival ? new Date(trip.estimatedArrival).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : "—"}
                         </td>
                       </tr>
                     ))}
