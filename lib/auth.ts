@@ -11,8 +11,8 @@ export interface DecodedToken {
   exp: number;
 }
 
-export function generateToken(payload: { id: string; email: string; role: string }) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
+export function generateToken(payload: { id: string; email: string; role: string }, expiresIn: string | number = '1d') {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: expiresIn as any });
 }
 
 export function verifyToken(token: string): DecodedToken | null {

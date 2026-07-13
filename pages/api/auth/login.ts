@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role, rememberMe } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
@@ -30,15 +30,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    const expiresIn = rememberMe ? '30d' : '1d';
+    const maxAge = rememberMe ? 2592000 : 86400; // 30 days or 1 day in seconds
+
     const token = generateToken({
       id: user.id,
       email: user.email,
       role: user.role,
-    });
+    }, expiresIn);
 
     res.setHeader(
       'Set-Cookie',
-      `token=${token}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`
+      `token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Strict`
     );
 
     res.status(200).json({
