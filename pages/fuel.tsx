@@ -164,7 +164,7 @@ export default function FuelExpenses() {
                 <form onSubmit={handleFuelSubmit} className="space-y-4">
                   <div className="grid gap-2">
                     <Label htmlFor="vehicleId">Vehicle</Label>
-                    <Select value={fuelForm.vehicleId} onValueChange={(val) => setFuelForm({ ...fuelForm, vehicleId: val })} required>
+                    <Select value={fuelForm.vehicleId} onValueChange={(val) => val && setFuelForm({ ...fuelForm, vehicleId: val })} required>
                       <SelectTrigger>
                         <SelectValue placeholder="Select vehicle" />
                       </SelectTrigger>
@@ -214,7 +214,7 @@ export default function FuelExpenses() {
                 <form onSubmit={handleExpenseSubmit} className="space-y-4">
                   <div className="grid gap-2">
                     <Label htmlFor="tripId">Trip (Optional)</Label>
-                    <Select value={expenseForm.tripId} onValueChange={(val) => setExpenseForm({ ...expenseForm, tripId: val === 'none' ? '' : val })}>
+                    <Select value={expenseForm.tripId} onValueChange={(val) => val && setExpenseForm({ ...expenseForm, tripId: val === 'none' ? '' : val })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select trip" />
                       </SelectTrigger>
@@ -228,7 +228,7 @@ export default function FuelExpenses() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="expenseVehicleId">Vehicle (Optional)</Label>
-                    <Select value={expenseForm.vehicleId} onValueChange={(val) => setExpenseForm({ ...expenseForm, vehicleId: val === 'none' ? '' : val })}>
+                    <Select value={expenseForm.vehicleId} onValueChange={(val) => val && setExpenseForm({ ...expenseForm, vehicleId: val === 'none' ? '' : val })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select vehicle" />
                       </SelectTrigger>
@@ -242,7 +242,7 @@ export default function FuelExpenses() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="type">Expense Type</Label>
-                    <Select value={expenseForm.type} onValueChange={(val) => setExpenseForm({ ...expenseForm, type: val })} required>
+                    <Select value={expenseForm.type} onValueChange={(val) => val && setExpenseForm({ ...expenseForm, type: val })} required>
                       <SelectTrigger>
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
@@ -360,7 +360,7 @@ export default function FuelExpenses() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tripExpenses.length > 0 ? tripExpenses.slice((expensePage - 1) * ITEMS_PER_PAGE, expensePage * ITEMS_PER_PAGE).map((exp: { tripName: string, vehicle: string, toll: number, other: number, maint: number, status: string }, idx: number) => {
+                  {tripExpenses.length > 0 ? tripExpenses.slice((expensePage - 1) * ITEMS_PER_PAGE, expensePage * ITEMS_PER_PAGE).map((exp: any, idx: number) => {
                     const total = exp.toll + exp.other + exp.maint;
                     return (
                       <tr key={idx} className="border-b border-border hover:bg-muted/30 transition-colors">

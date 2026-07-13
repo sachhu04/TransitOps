@@ -140,7 +140,7 @@ export default function Dashboard() {
             Filters
           </div>
           <div className="flex flex-wrap gap-3">
-            <Select value={vehicleType} onValueChange={setVehicleType}>
+            <Select value={vehicleType} onValueChange={(val) => val && setVehicleType(val)}>
               <SelectTrigger className="w-[160px] bg-background">
                 <SelectValue placeholder="Vehicle Type" />
               </SelectTrigger>
@@ -153,7 +153,7 @@ export default function Dashboard() {
                 <SelectItem value="Pickup">Pickup</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={(val) => val && setStatus(val)}>
               <SelectTrigger className="w-[160px] bg-background">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -165,7 +165,7 @@ export default function Dashboard() {
                 <SelectItem value="RETIRED">Retired</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={region} onValueChange={setRegion}>
+            <Select value={region} onValueChange={(val) => val && setRegion(val)}>
               <SelectTrigger className="w-[160px] bg-background">
                 <SelectValue placeholder="Region" />
               </SelectTrigger>

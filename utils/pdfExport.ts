@@ -56,7 +56,7 @@ export const exportToPDF = ({ title, filename, headers, data, orientation = "por
     },
     didDrawPage: (dataArg) => {
       // Add Page Number at the bottom
-      const str = `Page ${doc.internal.getNumberOfPages()}`;
+      const str = `Page ${(doc.internal as any).getNumberOfPages()}`;
       doc.setFontSize(10);
       doc.setTextColor(100);
       const pageSize = doc.internal.pageSize;
