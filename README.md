@@ -1,35 +1,35 @@
 <div align="center">
-  <h1>🚍 TransitOps</h1>
-  <p><strong>A comprehensive, modern fleet management and logistics platform built to streamline transport operations.</strong></p>
+  <h1>TransitOps</h1>
+  <p><strong>Enterprise-Grade Fleet Management and Logistics Platform</strong></p>
   
   <p>
-    <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" /></a>
-    <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" /></a>
-    <a href="https://ui.shadcn.com/"><img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="shadcn/ui" /></a>
-    <a href="https://www.prisma.io/"><img src="https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=Prisma&logoColor=white" alt="Prisma" /></a>
-    <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></a>
-    <a href="https://vercel.com/"><img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" /></a>
+    <a href="https://skillicons.dev">
+      <img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,prisma,supabase,vercel" alt="Technology Stack" />
+    </a>
   </p>
+  
   <p>
     <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&h=300&auto=format&fit=crop" alt="Logistics Banner" width="100%" style="border-radius: 12px; margin-top: 10px;" />
   </p>
 </div>
 
-TransitOps provides real-time tracking, intelligent dashboarding, maintenance scheduling, and financial analytics—all wrapped in a stunning, fully responsive UI.
+TransitOps is a comprehensive fleet management and logistics platform engineered to streamline the operations of modern transport businesses. The application provides real-time tracking, intelligent dashboarding, maintenance scheduling, and financial analytics within a highly responsive, performant user interface.
 
-## ✨ Features
+## Core Features
 
-- **📊 Intelligent Dashboard**: Get a bird's-eye view of your entire fleet, active trips, and financial metrics with beautiful charts.
-- **🚚 Fleet & Vehicle Management**: Track vehicle health scores, mileage, and real-time status (Available, On Trip, In Shop, Retired).
-- **👷 Driver Directory**: Monitor driver safety scores, license expirations, and trip histories.
-- **🗺️ Dispatch & Routing**: Create and manage trips, assign drivers and vehicles, and track revenue vs. expenses.
-- **⛽ Fuel & Maintenance Logs**: Keep detailed records of fuel consumption, tolls, and scheduled maintenance to optimize costs.
-- **🌓 Adaptive UI**: Buttery-smooth transitions between Light and Dark mode with a seamless toggle experience.
-- **📄 PDF Reporting**: Instantly export data tables and logs into beautifully formatted PDF reports.
+- **Intelligent Dashboard**: High-level operational overview encompassing active fleet status, trip progression, and financial metrics through dynamic data visualization.
+- **Fleet and Vehicle Management**: Granular tracking of vehicle health scores, cumulative mileage, and real-time operational status (Available, On Trip, In Shop, Retired).
+- **Driver Directory**: Comprehensive monitoring of driver safety metrics, license validation periods, and historical trip execution.
+- **Dispatch and Routing**: Centralized trip creation, vehicle-driver assignment, and comprehensive revenue versus expense tracking.
+- **Fuel and Maintenance Logging**: Strict record-keeping protocols for fuel consumption, toll expenditures, and scheduled maintenance to optimize long-term operational costs.
+- **Adaptive Interface**: Seamless transition capabilities between Light and Dark display modes to accommodate various operational environments.
+- **Automated Reporting**: Instantaneous export of data tables and operational logs into strictly formatted PDF reports.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
+
+The TransitOps platform utilizes a modern, serverless architecture optimized for high availability and low latency.
 
 ```mermaid
 graph TD
@@ -42,14 +42,14 @@ graph TD
 
     Client -->|HTTP/REST| Vercel
     Vercel -->|Handles Pages/Auth| NextAPI
-    NextAPI -->|Query| Prisma
+    NextAPI -->|Query Execution| Prisma
     Prisma -->|TCP 6543 / pgbouncer=true| PgBouncer
     PgBouncer -->|Transaction Pooling| DB
 ```
 
-## 🗄️ Database Schema
+## Database Schema
 
-The core of TransitOps is its relational data model, ensuring strong data integrity across all operations:
+The foundational data model ensures strong relational integrity across all operational entities.
 
 ```mermaid
 erDiagram
@@ -106,13 +106,13 @@ erDiagram
     Trip ||--o{ Expense : incurs
 ```
 
-## 🚀 Getting Started
+## Installation and Setup
 
 ### Prerequisites
-- Node.js (v18+)
-- A Supabase account (or local PostgreSQL database)
+- Node.js (v18 or higher)
+- A Supabase account or local PostgreSQL instance
 
-### Installation
+### Local Development Environment
 
 1. **Clone the repository:**
    ```bash
@@ -125,44 +125,44 @@ erDiagram
    npm install
    ```
 
-3. **Set up Environment Variables:**
-   Create a `.env` file in the root directory and add your Supabase connection strings:
+3. **Configure Environment Variables:**
+   Create a `.env` file in the project root and populate it with your Supabase credentials:
    ```env
    DATABASE_URL="postgresql://postgres.[PROJECT-ID]:[PASSWORD]@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
    DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres"
-   JWT_SECRET="your_super_secret_jwt_key"
+   JWT_SECRET="your_secure_jwt_secret"
    ```
 
-4. **Sync the Database Schema:**
+4. **Synchronize the Database Schema:**
    ```bash
    npx prisma db push
    ```
 
-5. **Seed the Database with Mock Data:**
+5. **Populate the Database with Initial Data:**
    ```bash
    npm run seed
-   # or
-   npx prisma db seed
+   # alternatively: npx prisma db seed
    ```
 
-6. **Run the Development Server:**
+6. **Initialize the Development Server:**
    ```bash
    npm run dev
    ```
-   Navigate to `http://localhost:3000` to view the application.
+   Access the application via `http://localhost:3000`.
 
 ---
 
-## 🔒 Authentication & Roles
+## Authentication and Role Management
 
-TransitOps uses stateless JWT authentication. When logging in, you must select the role that matches your account's assigned role in the database.
+TransitOps implements a stateless JWT authentication system. Access to specific modules is strictly governed by the user's assigned role within the database.
 
-- **FLEET_MANAGER**: Full access to all modules.
-- **DISPATCHER**: Manage Trips, Vehicles, and Drivers.
-- **SAFETY_OFFICER**: Monitor Vehicle Health and Driver Safety Scores.
-- **FINANCIAL_ANALYST**: Access to Revenue, Expenses, and Fuel Logs.
+- **FLEET_MANAGER**: Unrestricted access to all system modules and configurations.
+- **DISPATCHER**: Authorized to manage Trips, Vehicles, and Driver assignments.
+- **SAFETY_OFFICER**: Authorized to monitor Vehicle Health records and Driver Safety metrics.
+- **FINANCIAL_ANALYST**: Authorized access restricted to Revenue, Expenses, and Fuel Logs.
 
-## 🚢 Deployment
+## Production Deployment
 
-This project is optimized for deployment on **Vercel**. 
-When deploying, make sure to add `DATABASE_URL`, `DIRECT_URL`, and `JWT_SECRET` to your Vercel Project Environment Variables (without surrounding quotation marks). The `postinstall` script in `package.json` will automatically generate the Prisma Client during the Vercel build process.
+This repository is pre-configured for seamless deployment on **Vercel**. 
+
+During the deployment configuration, ensure that `DATABASE_URL`, `DIRECT_URL`, and `JWT_SECRET` are added to the Vercel Project Environment Variables (omitting surrounding quotation marks). The `postinstall` script defined in `package.json` guarantees the generation of the Prisma Client during the Vercel build phase.
