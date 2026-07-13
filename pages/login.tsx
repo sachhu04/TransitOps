@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ModeToggle } from "@/components/mode-toggle";
 
 const loginSchema = z.object({
@@ -28,6 +28,31 @@ export default function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const [showSplash, setShowSplash] = useState(true);
+  const [stats, setStats] = useState({ registeredVehicles: "...", totalDrivers: "..." });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/stats/public');
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        } else {
+          setStats({ registeredVehicles: "2,400+", totalDrivers: "8,500+" });
+        }
+      } catch (error) {
+        setStats({ registeredVehicles: "2,400+", totalDrivers: "8,500+" });
+      }
+      
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 1500); // 1.5 seconds minimum loading time
+    };
+    
+    fetchStats();
+  }, []);
   
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -70,7 +95,42 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-transparent relative">
+    <>
+      <AnimatePresence>
+        {showSplash && (
+          <motion.div
+            key="splash"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+              className="flex flex-col items-center gap-6"
+            >
+              <div className="bg-primary p-4 rounded-2xl shadow-2xl shadow-primary/20">
+                <Map className="w-16 h-16 text-primary-foreground" />
+              </div>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <h1 className="text-4xl font-bold tracking-tight">TransitOps</h1>
+                <p className="text-muted-foreground">Initializing logistics platform...</p>
+              </div>
+              <Loader2 className="w-8 h-8 text-primary animate-spin mt-4" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showSplash ? 0 : 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="min-h-screen w-full flex bg-transparent relative"
+      >
       <Head>
         <title>Login | TransitOps</title>
       </Head>
@@ -114,12 +174,12 @@ export default function Login() {
         >
           <div className="bg-black/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
             <Truck className="w-8 h-8 mb-4 text-white/80" />
-            <div className="text-3xl font-bold mb-1">2,400+</div>
-            <div className="text-sm text-white/70">Active Vehicles</div>
+            <div className="text-3xl font-bold mb-1">{stats.registeredVehicles || "2,400+"}</div>
+            <div className="text-sm text-white/70">Registered Vehicles</div>
           </div>
           <div className="bg-black/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
             <Users className="w-8 h-8 mb-4 text-white/80" />
-            <div className="text-3xl font-bold mb-1">8,500+</div>
+            <div className="text-3xl font-bold mb-1">{stats.totalDrivers}</div>
             <div className="text-sm text-white/70">Registered Drivers</div>
           </div>
           <div className="bg-black/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 col-span-2">
@@ -259,6 +319,7 @@ export default function Login() {
           </p>
         </motion.div>
       </div>
-    </div>
+      </motion.div>
+    </>
   );
 }
