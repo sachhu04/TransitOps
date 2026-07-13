@@ -173,12 +173,12 @@ export default function Analytics() {
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={monthlyRevenueData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                     <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                     <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
                     <RechartsTooltip contentStyle={{ borderRadius: '10px' }} formatter={(val) => `₹${(val as number).toLocaleString()}`} />
-                    <Bar dataKey="cost" fill="#f97316" radius={[4, 4, 0, 0]} barSize={40} name="Cost" />
-                    <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} name="Revenue" />
+                    <Bar dataKey="cost" fill="#FFA987" radius={[4, 4, 0, 0]} barSize={40} name="Cost" />
+                    <Line type="monotone" dataKey="revenue" stroke="#E54B4B" strokeWidth={3} name="Revenue" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>

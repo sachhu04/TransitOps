@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -69,10 +70,14 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-background">
+    <div className="min-h-screen w-full flex bg-transparent relative">
       <Head>
         <title>Login | TransitOps</title>
       </Head>
+      
+      <div className="absolute top-6 right-6 z-50">
+        <ModeToggle />
+      </div>
       
       {/* Left Panel - Branding & Stats */}
       <div className="hidden lg:flex w-1/2 bg-primary flex-col justify-between p-12 text-primary-foreground relative overflow-hidden">

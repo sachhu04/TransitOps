@@ -14,7 +14,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   const isLoginPage = router.pathname === "/login";
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange forcedTheme={isLoginPage ? "light" : undefined}>
+    <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
       <style jsx global>{`
         :root {
           --font-sans: ${spaceGrotesk.style.fontFamily};

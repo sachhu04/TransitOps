@@ -298,7 +298,7 @@ export default function Dashboard() {
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                     <XAxis
                       dataKey="name"
                       stroke="#888888"
@@ -318,8 +318,8 @@ export default function Dashboard() {
                       contentStyle={{ borderRadius: '10px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     />
                     <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                    <Bar dataKey="revenue" name="Revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={25} />
-                    <Bar dataKey="cost" name="Operational Cost" fill="#f97316" radius={[4, 4, 0, 0]} barSize={25} />
+                    <Bar dataKey="revenue" name="Revenue" fill="#E54B4B" radius={[4, 4, 0, 0]} barSize={25} />
+                    <Bar dataKey="cost" name="Operational Cost" fill="#FFA987" radius={[4, 4, 0, 0]} barSize={25} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
