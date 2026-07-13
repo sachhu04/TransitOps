@@ -1,101 +1,60 @@
-<div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=2563eb&height=250&section=header&text=TransitOps&fontSize=70&fontColor=ffffff&animation=fadeIn" alt="TransitOps Banner" />
+# 🚍 TransitOps
 
-  <h3 align="center">A Modern Fleet & Logistics Management SaaS Platform</h3>
+![TransitOps Banner](https://via.placeholder.com/1200x300/E54B4B/FFFFFF?text=TransitOps+-+Modern+Fleet+Management)
 
-  <p align="center">
-    <strong>Built for the Odoo Hackathon</strong>
-    <br />
-    <br />
-    <a href="#overview">Overview</a>
-    ·
-    <a href="#features">Features</a>
-    ·
-    <a href="#tech-stack">Tech Stack</a>
-    ·
-    <a href="#system-design">System Design</a>
-    ·
-    <a href="#getting-started">Getting Started</a>
-  </p>
-</div>
+TransitOps is a comprehensive, modern fleet management and logistics platform built to streamline the operations of transport businesses. It provides real-time tracking, intelligent dashboarding, maintenance scheduling, and financial analytics—all wrapped in a stunning, fully responsive UI.
 
-<br/>
+## ✨ Features
 
-## Overview
+- **📊 Intelligent Dashboard**: Get a bird's-eye view of your entire fleet, active trips, and financial metrics with beautiful charts.
+- **🚚 Fleet & Vehicle Management**: Track vehicle health scores, mileage, and real-time status (Available, On Trip, In Shop, Retired).
+- **👷 Driver Directory**: Monitor driver safety scores, license expirations, and trip histories.
+- **🗺️ Dispatch & Routing**: Create and manage trips, assign drivers and vehicles, and track revenue vs. expenses.
+- **⛽ Fuel & Maintenance Logs**: Keep detailed records of fuel consumption, tolls, and scheduled maintenance to optimize costs.
+- **🌓 Adaptive UI**: Buttery-smooth transitions between Light and Dark mode with a seamless toggle experience.
+- **📄 PDF Reporting**: Instantly export data tables and logs into beautifully formatted PDF reports.
 
-**TransitOps** is a comprehensive, end-to-end Fleet and Logistics Management platform. Built for the Odoo Hackathon, it provides a centralized dashboard to seamlessly manage vehicles, drivers, trips, maintenance, and expenses with built-in Role-Based Access Control (RBAC).
+## 🛠️ Technology Stack
 
-<br/>
+TransitOps is built on a cutting-edge modern web stack:
 
-## Tech Stack
+- **Frontend**: [Next.js](https://nextjs.org/) (React), [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/), Lucide Icons, Framer Motion, Recharts
+- **Backend/API**: Next.js API Routes, [Prisma ORM](https://www.prisma.io/)
+- **Database**: [Supabase](https://supabase.com/) (PostgreSQL with PgBouncer connection pooling)
+- **Authentication**: Custom JWT-based Role Auth
+- **Deployment**: [Vercel](https://vercel.com/)
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" alt="Prisma" />
-  <img src="https://img.shields.io/badge/Shadcn_UI-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="Shadcn UI" />
-  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
-</div>
+---
 
-<br/>
-
-## Features
-
-- **Interactive Dashboard**<br/>
-  High-level KPIs, fleet utilization, active trip tracking, and beautifully rendered charts.
-
-- **Fleet Management**<br/>
-  Track vehicle status, health scores, mileage, and maintenance logs in real time.
-
-- **Driver Management**<br/>
-  Manage driver profiles, licenses, safety scores, and duty availability.
-
-- **Trip Lifecycle Management**<br/>
-  Dispatch, track, and complete trips with real-time status updates from `DRAFT` to `COMPLETED`.
-
-- **Maintenance & Fuel Logs**<br/>
-  Record maintenance costs, log fuel expenses, and track overall operational efficiency.
-
-- **Analytics & Reports**<br/>
-  Exportable comprehensive reports (PDF & CSV) for fuel efficiency, ROI, and top costliest vehicles.
-
-- **Role-Based Access Control (RBAC)**<br/>
-  Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT.
-
-<br/>
-
-## System Design
-
-TransitOps is built on a modern, serverless-ready architecture utilizing Next.js for both the frontend (Pages Router) and backend (API Routes). 
-
-### Architecture Overview
+## 🏗️ System Architecture
 
 ```mermaid
 graph TD
-    Client(Client Browser)
-    NextJS[Next.js Frontend]
+    Client[Client Browser]
+    Vercel[Vercel Serverless Edge]
     NextAPI[Next.js API Routes]
-    Prisma[Prisma ORM]
-    PostgreSQL[(PostgreSQL Database)]
+    Prisma[Prisma Client]
+    PgBouncer[Supabase Connection Pooler]
+    DB[(Supabase PostgreSQL)]
 
-    Client <-->|HTTP / REST| NextJS
-    NextJS <-->|SWR Data Fetching| NextAPI
-    NextAPI <-->|Query & Mutations| Prisma
-    Prisma <-->|Connection Pool| PostgreSQL
+    Client -->|HTTP/REST| Vercel
+    Vercel -->|Handles Pages/Auth| NextAPI
+    NextAPI -->|Query| Prisma
+    Prisma -->|TCP 6543 / pgbouncer=true| PgBouncer
+    PgBouncer -->|Transaction Pooling| DB
 ```
 
-### Entity Relationship Schema
+## 🗄️ Database Schema
 
-Our data model is highly relational, connecting vehicles to trips, maintenance, fuel, and expenses, allowing for deep analytics on operational costs.
+The core of TransitOps is its relational data model, ensuring strong data integrity across all operations:
 
 ```mermaid
 erDiagram
     User {
         String id PK
         String email UK
+        String password
         String name
         Role role
     }
@@ -104,11 +63,11 @@ erDiagram
         String registration UK
         String type
         VehicleStatus status
+        Float mileage
         Float healthScore
     }
     Driver {
         String id PK
-        String name
         String licenseNumber UK
         Float safetyScore
         DriverStatus status
@@ -117,8 +76,8 @@ erDiagram
         String id PK
         String source
         String destination
+        Float revenue
         TripStatus status
-        Float distance
     }
     MaintenanceLog {
         String id PK
@@ -133,80 +92,75 @@ erDiagram
     }
     Expense {
         String id PK
-        String type
+        ExpenseCategory type
         Float amount
     }
 
-    Vehicle ||--o{ Trip : "makes"
-    Driver ||--o{ Trip : "drives"
-    Vehicle ||--o{ MaintenanceLog : "has"
-    Vehicle ||--o{ FuelLog : "has"
-    Vehicle ||--o{ Expense : "incurs"
-    Trip ||--o{ Expense : "incurs"
+    Vehicle ||--o{ Trip : completes
+    Driver ||--o{ Trip : drives
+    Vehicle ||--o{ MaintenanceLog : undergoes
+    Vehicle ||--o{ FuelLog : consumes
+    Vehicle ||--o{ Expense : incurs
+    Trip ||--o{ Expense : incurs
 ```
 
-<br/>
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js** (v18 or higher)
-- **PostgreSQL** database
+- Node.js (v18+)
+- A Supabase account (or local PostgreSQL database)
 
-### 1. Environment Setup
+### Installation
 
-Clone the repository and install dependencies:
-```bash
-npm install
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/sachhu04/TransitOps.git
+   cd TransitOps
+   ```
 
-Ensure you have a running PostgreSQL instance. Update the `DATABASE_URL` and `JWT_SECRET` in the `.env` file at the root of the project:
-```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/transitops?schema=public"
-JWT_SECRET="supersecret_jwt_key_transitops_hackathon_2026"
-```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### 2. Database Initialization
+3. **Set up Environment Variables:**
+   Create a `.env` file in the root directory and add your Supabase connection strings:
+   ```env
+   DATABASE_URL="postgresql://postgres.[PROJECT-ID]:[PASSWORD]@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
+   DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres"
+   JWT_SECRET="your_super_secret_jwt_key"
+   ```
 
-Run the Prisma commands to generate the Prisma Client and push the schema to your database:
-```bash
-npx prisma generate
-npx prisma db push
-```
+4. **Sync the Database Schema:**
+   ```bash
+   npx prisma db push
+   ```
 
-Seed the database with default roles, vehicles, and mock data:
-```bash
-npx prisma db seed
-```
-> **Note**: This will automatically populate the database with default users and mock data so you can immediately interact with the dashboard.
+5. **Seed the Database with Mock Data:**
+   ```bash
+   npm run seed
+   # or
+   npx prisma db seed
+   ```
 
-### 3. Default Credentials for Evaluator
+6. **Run the Development Server:**
+   ```bash
+   npm run dev
+   ```
+   Navigate to `http://localhost:3000` to view the application.
 
-You can use the following default credentials to log in and test different RBAC roles:
+---
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Fleet Manager** | `manager@transitops.in` | `password123` |
-| **Dispatcher** | `dispatcher@transitops.in` | `password123` |
-| **Safety Officer** | `safety@transitops.in` | `password123` |
-| **Financial Analyst** | `finance@transitops.in` | `password123` |
+## 🔒 Authentication & Roles
 
-### 4. Start Development Server
+TransitOps uses stateless JWT authentication. When logging in, you must select the role that matches your account's assigned role in the database.
 
-Run the development server:
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) with your browser to view the application.
+- **FLEET_MANAGER**: Full access to all modules.
+- **DISPATCHER**: Manage Trips, Vehicles, and Drivers.
+- **SAFETY_OFFICER**: Monitor Vehicle Health and Driver Safety Scores.
+- **FINANCIAL_ANALYST**: Access to Revenue, Expenses, and Fuel Logs.
 
-<br/>
+## 🚢 Deployment
 
-## API & Backend Documentation
-
-For detailed backend integration notes, API endpoints, and authentication workflows, refer to the [Backend README](./README-BACKEND.md).
-
-<br/>
-
-## License
-
-This project is licensed under the MIT License.
+This project is optimized for deployment on **Vercel**. 
+When deploying, make sure to add `DATABASE_URL`, `DIRECT_URL`, and `JWT_SECRET` to your Vercel Project Environment Variables (without surrounding quotation marks). The `postinstall` script in `package.json` will automatically generate the Prisma Client during the Vercel build process.
