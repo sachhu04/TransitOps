@@ -55,6 +55,12 @@
 - **Driver Management**<br/>
   Manage driver profiles, licenses, safety scores, and duty availability.
 
+- **Smart Notification Center**<br/>
+  Real-time in-app alerts for expiring driver licenses, pending trips, and vehicles requiring maintenance.
+
+- **Dynamic Initialization & Glassmorphic UI**<br/>
+  A sleek, modern interface utilizing Space Grotesk typography, glassmorphism (`backdrop-blur`), and a dynamic database-synced splash screen.
+
 - **Trip Lifecycle Management**<br/>
   Dispatch, track, and complete trips with real-time status updates from `DRAFT` to `COMPLETED`.
 

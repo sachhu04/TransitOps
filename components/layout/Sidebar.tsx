@@ -11,7 +11,8 @@ import {
   Fuel, 
   BarChart3,
   Map,
-  LogOut
+  LogOut,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +27,13 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ 
+  isMobileMenuOpen, 
+  setIsMobileMenuOpen 
+}: { 
+  isMobileMenuOpen?: boolean; 
+  setIsMobileMenuOpen?: (v: boolean) => void; 
+}) {
   const router = useRouter();
   const [user, setUser] = useState<{name: string; role: string} | null>(null);
 
@@ -51,16 +58,35 @@ export default function Sidebar() {
   const roleDisplay = user?.role ? user.role.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : 'User';
 
   return (
-    <div className="hidden md:flex flex-col w-[260px] bg-sidebar backdrop-blur-xl border-r border-white/10 dark:border-white/5">
-      {/* Brand */}
-      <div className="h-[72px] flex items-center px-6 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg">
-            <Map className="w-5 h-5 text-primary-foreground" />
+    <>
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen && setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Container */}
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-50 w-[260px] bg-sidebar backdrop-blur-xl border-r border-white/10 dark:border-white/5 flex flex-col transition-transform duration-300 md:static md:translate-x-0",
+        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Brand */}
+        <div className="h-[72px] flex items-center justify-between px-6 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary p-1.5 rounded-lg">
+              <Map className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-semibold text-lg tracking-tight">TransitOps</span>
           </div>
-          <span className="font-semibold text-lg tracking-tight">TransitOps</span>
+          <button 
+            className="md:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground"
+            onClick={() => setIsMobileMenuOpen && setIsMobileMenuOpen(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-      </div>
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-6 flex flex-col gap-1 px-3">
@@ -83,6 +109,7 @@ export default function Sidebar() {
                   ? "bg-primary/10 text-primary" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
+              onClick={() => setIsMobileMenuOpen && setIsMobileMenuOpen(false)}
             >
               {isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-full" />
@@ -113,6 +140,7 @@ export default function Sidebar() {
           <LogOut className="w-4 h-4" />
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
