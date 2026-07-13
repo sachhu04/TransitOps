@@ -7,9 +7,9 @@
 :root {
   --background: #F7EBE8;
   --foreground: #0f172a;
-  --card: rgba(255, 255, 255, 0.6);
+  --card: rgba(255, 255, 255, 0.85);
   --card-foreground: #0f172a;
-  --popover: rgba(255, 255, 255, 0.6);
+  --popover: rgba(255, 255, 255, 0.95);
   --popover-foreground: #0f172a;
   --primary: #E54B4B;
   --primary-foreground: #FFFFFF;
@@ -30,7 +30,7 @@
   --chart-4: #F59E0B;
   --chart-5: #3B82F6;
   --radius: 0.625rem;
-  --sidebar: rgba(255, 255, 255, 0.6);
+  --sidebar: rgba(255, 255, 255, 0.85);
   --sidebar-foreground: #0f172a;
   --sidebar-primary: #E54B4B;
   --sidebar-primary-foreground: #FFFFFF;
@@ -92,9 +92,9 @@
 .dark {
   --background: #0f172a;
   --foreground: #f8fafc;
-  --card: rgba(30, 41, 59, 0.5);
+  --card: rgba(30, 41, 59, 0.85);
   --card-foreground: #f8fafc;
-  --popover: rgba(30, 41, 59, 0.5);
+  --popover: rgba(30, 41, 59, 0.95);
   --popover-foreground: #f8fafc;
   --primary: #E54B4B;
   --primary-foreground: #FFFFFF;
@@ -114,7 +114,7 @@
   --chart-3: #22C55E;
   --chart-4: #F59E0B;
   --chart-5: #3B82F6;
-  --sidebar: rgba(30, 41, 59, 0.5);
+  --sidebar: rgba(30, 41, 59, 0.85);
   --sidebar-foreground: #f8fafc;
   --sidebar-primary: #E54B4B;
   --sidebar-primary-foreground: #FFFFFF;
