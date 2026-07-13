@@ -14,7 +14,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   const isLoginPage = router.pathname === "/login";
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange forcedTheme={isLoginPage ? "light" : undefined}>
+    <ThemeProvider attribute="class" defaultTheme="light" forcedTheme={isLoginPage ? "light" : undefined}>
       <div className={`${inter.className} min-h-screen bg-background font-sans antialiased text-foreground`}>
         <TooltipProvider>
           {isLoginPage ? (
