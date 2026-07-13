@@ -139,12 +139,12 @@ erDiagram
         Float amount
     }
 
-    Vehicle ||--o{ Trip : "makes"
-    Driver ||--o{ Trip : "drives"
-    Vehicle ||--o{ MaintenanceLog : "has"
-    Vehicle ||--o{ FuelLog : "has"
-    Vehicle ||--o{ Expense : "incurs"
-    Trip ||--o{ Expense : "incurs"
+    Vehicle ||--o{ Trip : makes
+    Driver ||--o{ Trip : drives
+    Vehicle ||--o{ MaintenanceLog : has
+    Vehicle ||--o{ FuelLog : has
+    Vehicle ||--o{ Expense : incurs
+    Trip ||--o{ Expense : incurs
 ```
 
 <br/>
