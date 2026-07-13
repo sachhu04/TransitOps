@@ -1,11 +1,11 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { Inter } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import Layout from "@/components/layout/Layout";
 
-const inter = Inter({ subsets: ["latin"] });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
 
 import { ThemeProvider } from "next-themes";
 
@@ -15,7 +15,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange forcedTheme={isLoginPage ? "light" : undefined}>
-      <div className={`${inter.className} min-h-screen bg-background font-sans antialiased text-foreground`}>
+      <div className={`${spaceGrotesk.className} min-h-screen font-sans antialiased text-foreground`}>
         <TooltipProvider>
           {isLoginPage ? (
             <Component {...pageProps} />

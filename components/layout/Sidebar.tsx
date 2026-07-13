@@ -51,7 +51,7 @@ export default function Sidebar() {
   const roleDisplay = user?.role ? user.role.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : 'User';
 
   return (
-    <div className="hidden md:flex flex-col w-[260px] bg-card border-r border-border">
+    <div className="hidden md:flex flex-col w-[260px] bg-sidebar backdrop-blur-xl border-r border-white/10 dark:border-white/5">
       {/* Brand */}
       <div className="h-[72px] flex items-center px-6 border-b border-border">
         <div className="flex items-center gap-2">

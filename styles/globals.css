@@ -7,9 +7,9 @@
 :root {
   --background: #F7EBE8;
   --foreground: #0f172a;
-  --card: #FFFFFF;
+  --card: rgba(255, 255, 255, 0.6);
   --card-foreground: #0f172a;
-  --popover: #FFFFFF;
+  --popover: rgba(255, 255, 255, 0.6);
   --popover-foreground: #0f172a;
   --primary: #E54B4B;
   --primary-foreground: #FFFFFF;
@@ -30,7 +30,7 @@
   --chart-4: #F59E0B;
   --chart-5: #3B82F6;
   --radius: 0.625rem;
-  --sidebar: #FFFFFF;
+  --sidebar: rgba(255, 255, 255, 0.6);
   --sidebar-foreground: #0f172a;
   --sidebar-primary: #E54B4B;
   --sidebar-primary-foreground: #FFFFFF;
@@ -92,9 +92,9 @@
 .dark {
   --background: #0f172a;
   --foreground: #f8fafc;
-  --card: #1e293b;
+  --card: rgba(30, 41, 59, 0.5);
   --card-foreground: #f8fafc;
-  --popover: #1e293b;
+  --popover: rgba(30, 41, 59, 0.5);
   --popover-foreground: #f8fafc;
   --primary: #E54B4B;
   --primary-foreground: #FFFFFF;
@@ -114,7 +114,7 @@
   --chart-3: #22C55E;
   --chart-4: #F59E0B;
   --chart-5: #3B82F6;
-  --sidebar: #1e293b;
+  --sidebar: rgba(30, 41, 59, 0.5);
   --sidebar-foreground: #f8fafc;
   --sidebar-primary: #E54B4B;
   --sidebar-primary-foreground: #FFFFFF;
@@ -130,6 +130,20 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(at 100% 0%, rgba(229, 75, 75, 0.15) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(255, 169, 135, 0.15) 0px, transparent 50%),
+      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+  }
+  .dark body {
+    background-image: 
+      radial-gradient(at 100% 0%, rgba(229, 75, 75, 0.15) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(255, 169, 135, 0.1) 0px, transparent 50%),
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   }
   html {
     @apply font-sans;

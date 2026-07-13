@@ -27,7 +27,7 @@ export default function TopNav() {
   const roleDisplay = user?.role ? user.role.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : 'User';
 
   return (
-    <header className="h-[72px] bg-card border-b border-border flex items-center justify-between px-4 md:px-8 shrink-0 sticky top-0 z-10">
+    <header className="h-[72px] bg-card backdrop-blur-xl border-b border-white/10 dark:border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 sticky top-0 z-10">
       {/* Left section - Mobile Menu & Search */}
       <div className="flex items-center gap-4 flex-1">
         <Button variant="ghost" size="icon" className="md:hidden">
