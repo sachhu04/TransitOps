@@ -1,8 +1,21 @@
-# 🚍 TransitOps
+<div align="center">
+  <h1>🚍 TransitOps</h1>
+  <p><strong>A comprehensive, modern fleet management and logistics platform built to streamline transport operations.</strong></p>
+  
+  <p>
+    <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" /></a>
+    <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" /></a>
+    <a href="https://ui.shadcn.com/"><img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="shadcn/ui" /></a>
+    <a href="https://www.prisma.io/"><img src="https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=Prisma&logoColor=white" alt="Prisma" /></a>
+    <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></a>
+    <a href="https://vercel.com/"><img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" /></a>
+  </p>
+  <p>
+    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&h=300&auto=format&fit=crop" alt="Logistics Banner" width="100%" style="border-radius: 12px; margin-top: 10px;" />
+  </p>
+</div>
 
-![TransitOps Banner](https://via.placeholder.com/1200x300/E54B4B/FFFFFF?text=TransitOps+-+Modern+Fleet+Management)
-
-TransitOps is a comprehensive, modern fleet management and logistics platform built to streamline the operations of transport businesses. It provides real-time tracking, intelligent dashboarding, maintenance scheduling, and financial analytics—all wrapped in a stunning, fully responsive UI.
+TransitOps provides real-time tracking, intelligent dashboarding, maintenance scheduling, and financial analytics—all wrapped in a stunning, fully responsive UI.
 
 ## ✨ Features
 
@@ -13,17 +26,6 @@ TransitOps is a comprehensive, modern fleet management and logistics platform bu
 - **⛽ Fuel & Maintenance Logs**: Keep detailed records of fuel consumption, tolls, and scheduled maintenance to optimize costs.
 - **🌓 Adaptive UI**: Buttery-smooth transitions between Light and Dark mode with a seamless toggle experience.
 - **📄 PDF Reporting**: Instantly export data tables and logs into beautifully formatted PDF reports.
-
-## 🛠️ Technology Stack
-
-TransitOps is built on a cutting-edge modern web stack:
-
-- **Frontend**: [Next.js](https://nextjs.org/) (React), [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**: [shadcn/ui](https://ui.shadcn.com/), Lucide Icons, Framer Motion, Recharts
-- **Backend/API**: Next.js API Routes, [Prisma ORM](https://www.prisma.io/)
-- **Database**: [Supabase](https://supabase.com/) (PostgreSQL with PgBouncer connection pooling)
-- **Authentication**: Custom JWT-based Role Auth
-- **Deployment**: [Vercel](https://vercel.com/)
 
 ---
 
