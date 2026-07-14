@@ -13,7 +13,7 @@ This document provides a comprehensive overview of the backend implementation fo
 
 ## Environment Configuration
 
-Because TransitOps relies on a serverless architecture (Vercel), standard database connections can quickly exhaust connection limits. To solve this, the application leverages **Supabase Connection Pooling (PgBouncer)**.
+Because TransitOps relies on a serverless architecture (Vercel), standard database connections can quickly exhaust connection limits. To solve this, the application leverages Supabase Connection Pooling (PgBouncer).
 
 ### Local Configuration
 
@@ -52,7 +52,6 @@ Because TransitOps relies on a serverless architecture (Vercel), standard databa
    Populate the database with initial analytical metrics, vehicles, drivers, and trips:
    ```bash
    npm run seed
-   # or: npx prisma db seed
    ```
 
 5. **Start Application Server**
@@ -64,7 +63,7 @@ Because TransitOps relies on a serverless architecture (Vercel), standard databa
 
 ### Authentication & Users (`/api/auth` & `/api/users`)
 - `POST /api/auth/login`: Authenticates user credentials and provisions a JWT.
-- `POST /api/auth/register`: (Admin Only) Creates an invitation in an isolated `Invitation` table and dispatches a magic setup link via Google OAuth2 Nodemailer.
+- `POST /api/auth/register`: (Admin Only) Creates an invitation in an isolated Invitation table and dispatches a magic setup link via Google OAuth2 Nodemailer.
 - `POST /api/auth/setup-account`: Consumes an invitation token to finalize user creation and set passwords.
 - `POST /api/auth/forgot-password`: Generates a rate-limited (15-min) and cryptographically hashed password reset token.
 - `POST /api/auth/reset-password`: Consumes a reset token to update user credentials securely.
@@ -84,12 +83,12 @@ Because TransitOps relies on a serverless architecture (Vercel), standard databa
 ### Trips (`/api/trips`)
 - `GET /api/trips`: Retrieves all historical and active trips, joined with specific driver and vehicle relations.
 - `POST /api/trips`: Creates a trip (enforces strict logistical business rules regarding vehicle availability).
-- `PATCH /api/trips/[id]/status`: Mutates trip status (`DISPATCHED`, `COMPLETED`, `CANCELLED`), automatically triggering side-effects to adjust vehicle and driver availability states.
+- `PATCH /api/trips/[id]/status`: Mutates trip status (DISPATCHED, COMPLETED, CANCELLED), automatically triggering side-effects to adjust vehicle and driver availability states.
 
 ### Maintenance (`/api/maintenance`)
 - `GET /api/maintenance`: Retrieves maintenance and repair logs.
 - `POST /api/maintenance`: Submits a new maintenance work order.
-- `PATCH /api/maintenance/[id]/status`: Mutates log status, automatically adjusting corresponding vehicle states (`IN_SHOP` or `AVAILABLE`).
+- `PATCH /api/maintenance/[id]/status`: Mutates log status, automatically adjusting corresponding vehicle states (IN_SHOP or AVAILABLE).
 
 ### Fuel & Analytics (`/api/fuel` & `/api/reports`)
 - `GET /api/fuel`: Retrieves all fleet fuel consumption logs.
@@ -99,5 +98,5 @@ Because TransitOps relies on a serverless architecture (Vercel), standard databa
 ## Client-Server Integration Status
 
 - **Fully Integrated API**: All frontend dashboard modules directly interact with the Next.js Serverless API endpoints using SWR.
-- **Authentication**: The `Login` page securely connects to `/api/auth/login` and persists the JWT as an HTTP-only cookie or local storage, attaching it securely to subsequent API requests.
+- **Authentication**: The Login page securely connects to `/api/auth/login` and persists the JWT as an HTTP-only cookie or local storage, attaching it securely to subsequent API requests.
 - **Role-Based Access Control (RBAC)**: Strict RBAC is enforced both on the UI layer (conditional rendering) and the Server layer (API route validation).

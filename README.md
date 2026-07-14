@@ -23,7 +23,7 @@
 
 ## Overview
 
-**TransitOps** is a comprehensive, end-to-end Fleet and Logistics Management platform. Built for the Odoo Hackathon, it provides a centralized dashboard to seamlessly manage vehicles, drivers, trips, maintenance, and expenses with built-in Role-Based Access Control (RBAC).
+**TransitOps** is a comprehensive, end-to-end Fleet and Logistics Management platform. Built for the Odoo Hackathon, it provides a centralized dashboard to seamlessly manage vehicles, drivers, trips, maintenance, and expenses with built-in Role-Based Access Control (RBAC). The platform features a premium, minimalist "Bento Grid" user interface designed for high-density data visualization and operational efficiency.
 
 ---
 
@@ -38,21 +38,20 @@
   <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
   <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
-  <img src="https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Google Cloud" />
   <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white" alt="JWT" />
   <img src="https://img.shields.io/badge/Shadcn_UI-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="Shadcn UI" />
-  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/Recharts-000000?style=for-the-badge&logo=react&logoColor=white" alt="Recharts" />
 </div>
 
 ---
 
 ## Features
 
-**Interactive Dashboard**  
-High-level KPIs, fleet utilization, active trip tracking, and beautifully rendered charts.
+**Premium Bento Grid Dashboard**  
+A high-performance, minimalist interface featuring advanced Recharts data visualizations, SVG linear gradients, and responsive grid layouts for optimal data consumption.
 
 **Enterprise Authentication & Invitations**  
-Secure "magic link" email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database-level rate limiting.
+Secure email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database-level rate limiting.
 
 **Production Email Infrastructure**  
 Automated server-to-server email dispatch using Google OAuth2 (Client ID & Refresh Token) to bypass cloud SMTP blocking heuristics on Vercel.
@@ -63,20 +62,14 @@ Track vehicle status, health scores, mileage, and maintenance logs in real time.
 **Driver Management**  
 Manage driver profiles, licenses, safety scores, and duty availability.
 
-**Smart Notification Center**  
-Real-time in-app alerts for expiring driver licenses, pending trips, and vehicles requiring maintenance.
-
-**Dynamic Initialization & Glassmorphic UI**  
-A sleek, modern interface utilizing Space Grotesk typography, glassmorphism, and a dynamic database-synced splash screen.
-
 **Trip Lifecycle Management**  
-Dispatch, track, and complete trips with real-time status updates from `DRAFT` to `COMPLETED`.
+Dispatch, track, and complete trips with real-time status updates from DRAFT to COMPLETED.
 
 **Maintenance & Fuel Logs**  
 Record maintenance costs, log fuel expenses, and track overall operational efficiency.
 
 **Analytics & Reports**  
-Exportable comprehensive reports (PDF & CSV) for fuel efficiency, ROI, and top costliest vehicles.
+Exportable comprehensive reports (PDF format) for fuel efficiency, ROI, and top costliest vehicles.
 
 **Role-Based Access Control (RBAC)**  
 Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT. Advanced admin capabilities for permanent user deletion and team management.
@@ -105,7 +98,7 @@ graph TD
 
 ### Entity Relationship Schema
 
-The data model is highly relational, connecting vehicles to trips, maintenance, fuel, and expenses, allowing for deep analytics on operational costs. It also strictly isolates authentication lifecycles (Invitations, Rate Limits).
+The data model is highly relational, connecting vehicles to trips, maintenance, fuel, and expenses, allowing for deep analytics on operational costs. It also strictly isolates authentication lifecycles.
 
 ```mermaid
 erDiagram
@@ -121,11 +114,6 @@ erDiagram
         String email UK
         String token UK
         DateTime expiresAt
-    }
-    RateLimit {
-        String id PK
-        String identifier
-        String action
     }
     Vehicle {
         String id PK
@@ -162,11 +150,6 @@ erDiagram
         ExpenseCategory type
         Float amount
     }
-    ActivityLog {
-        String id PK
-        String action
-        String entity
-    }
 
     Vehicle ||--o{ Trip : makes
     Driver ||--o{ Trip : drives
@@ -174,7 +157,6 @@ erDiagram
     Vehicle ||--o{ FuelLog : has
     Vehicle ||--o{ Expense : incurs
     Trip ||--o{ Expense : incurs
-    User ||--o{ ActivityLog : generates
 ```
 
 ---
@@ -182,8 +164,8 @@ erDiagram
 ## Getting Started
 
 ### Prerequisites
-- **Node.js** (v18 or higher)
-- **PostgreSQL** database (or Supabase)
+- Node.js (v18 or higher)
+- PostgreSQL database (or Supabase)
 
 ### 1. Environment Setup
 

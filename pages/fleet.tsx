@@ -364,11 +364,12 @@ export default function Fleet() {
         <title>Fleet | TransitOps</title>
       </Head>
       
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
+      <div className="flex-1 space-y-8 p-1 sm:p-4">
+        {/* Classy Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border/60">
+          <div className="space-y-1.5">
             <h1 className="text-3xl font-bold tracking-tight">Vehicle Registry</h1>
-            <p className="text-muted-foreground">Manage and track your entire fleet.</p>
+            <p className="text-sm text-muted-foreground">Manage and track your entire fleet.</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleExportPDF}>

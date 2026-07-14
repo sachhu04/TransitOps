@@ -5,15 +5,15 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #F7EBE8;
+  --background: #f8fafc;
   --foreground: #0f172a;
-  --card: rgba(255, 255, 255, 0.85);
+  --card: #ffffff;
   --card-foreground: #0f172a;
-  --popover: rgba(255, 255, 255, 0.95);
+  --popover: #ffffff;
   --popover-foreground: #0f172a;
   --primary: #E54B4B;
   --primary-foreground: #FFFFFF;
-  --secondary: #FFA987;
+  --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
@@ -23,21 +23,21 @@
   --destructive-foreground: #FFFFFF;
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --ring: #E54B4B;
+  --ring: #94a3b8;
   --chart-1: #E54B4B;
   --chart-2: #FFA987;
   --chart-3: #22C55E;
   --chart-4: #F59E0B;
   --chart-5: #3B82F6;
-  --radius: 0.625rem;
-  --sidebar: rgba(255, 255, 255, 0.85);
+  --radius: 0.5rem;
+  --sidebar: #ffffff;
   --sidebar-foreground: #0f172a;
   --sidebar-primary: #E54B4B;
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #f1f5f9;
   --sidebar-accent-foreground: #0f172a;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #E54B4B;
+  --sidebar-ring: #94a3b8;
 }
 
 @theme inline {
@@ -92,14 +92,14 @@
 .dark {
   --background: #09090b;
   --foreground: #fafafa;
-  --card: rgba(24, 24, 27, 0.85);
+  --card: #09090b;
   --card-foreground: #fafafa;
-  --popover: rgba(24, 24, 27, 0.95);
+  --popover: #09090b;
   --popover-foreground: #fafafa;
   --primary: #E54B4B;
   --primary-foreground: #FFFFFF;
-  --secondary: #FFA987;
-  --secondary-foreground: #09090b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
   --muted: #27272a;
   --muted-foreground: #a1a1aa;
   --accent: #27272a;
@@ -108,20 +108,20 @@
   --destructive-foreground: #FFFFFF;
   --border: #27272a;
   --input: #27272a;
-  --ring: #E54B4B;
+  --ring: #3f3f46;
   --chart-1: #E54B4B;
   --chart-2: #FFA987;
   --chart-3: #22C55E;
   --chart-4: #F59E0B;
   --chart-5: #3B82F6;
-  --sidebar: rgba(24, 24, 27, 0.85);
+  --sidebar: #09090b;
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #E54B4B;
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #27272a;
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #27272a;
-  --sidebar-ring: #E54B4B;
+  --sidebar-ring: #3f3f46;
 }
 
 @layer base {
@@ -130,20 +130,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: 
-      radial-gradient(at 100% 0%, rgba(229, 75, 75, 0.15) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(255, 169, 135, 0.15) 0px, transparent 50%),
-      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-    background-attachment: fixed;
-  }
-  .dark body {
-    background-image: 
-      radial-gradient(at 100% 0%, rgba(229, 75, 75, 0.15) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(255, 169, 135, 0.1) 0px, transparent 50%),
-      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   }
   html {
     @apply font-sans;

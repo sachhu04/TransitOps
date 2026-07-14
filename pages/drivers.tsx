@@ -187,17 +187,20 @@ export default function Drivers() {
     });
   };
 
+  const bentoCardStyle = "group hover:border-border/80 transition-all duration-300 hover:shadow-md flex flex-col";
+
   return (
     <>
       <Head>
         <title>Drivers | TransitOps</title>
       </Head>
       
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
+      <div className="flex-1 space-y-8 p-1 sm:p-4">
+        {/* Classy Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border/60">
+          <div className="space-y-1.5">
             <h1 className="text-3xl font-bold tracking-tight">Driver Directory</h1>
-            <p className="text-muted-foreground">Manage your driving staff and monitor safety scores.</p>
+            <p className="text-sm text-muted-foreground">Manage your driving staff and monitor safety scores.</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleExportPDF}>
@@ -268,44 +271,44 @@ export default function Drivers() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-5">
-          <Card>
-            <CardHeader className="pb-2">
+          <Card className={bentoCardStyle}>
+            <CardHeader className="pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Drivers</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.totalDrivers || 0)}</div>
+              <div className="text-2xl font-bold tracking-tight">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.totalDrivers || 0)}</div>
             </CardContent>
           </Card>
-          <Card className="border-t-4 border-t-success">
-            <CardHeader className="pb-2">
+          <Card className={bentoCardStyle}>
+            <CardHeader className="pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Available</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-success">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.availableDrivers || 0)}</div>
+              <div className="text-2xl font-bold tracking-tight text-success">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.availableDrivers || 0)}</div>
             </CardContent>
           </Card>
-          <Card className="border-t-4 border-t-info">
-            <CardHeader className="pb-2">
+          <Card className={bentoCardStyle}>
+            <CardHeader className="pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">On Trip</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-info">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.driversOnDuty || 0)}</div>
+              <div className="text-2xl font-bold tracking-tight text-info">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.driversOnDuty || 0)}</div>
             </CardContent>
           </Card>
-          <Card className="border-t-4 border-t-muted">
-            <CardHeader className="pb-2">
+          <Card className={bentoCardStyle}>
+            <CardHeader className="pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Off Duty</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-muted-foreground">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.offDutyDrivers || 0)}</div>
+              <div className="text-2xl font-bold tracking-tight text-muted-foreground">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.offDutyDrivers || 0)}</div>
             </CardContent>
           </Card>
-          <Card className="border-t-4 border-t-destructive">
-            <CardHeader className="pb-2">
+          <Card className={bentoCardStyle}>
+            <CardHeader className="pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Suspended</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.suspendedDrivers || 0)}</div>
+              <div className="text-2xl font-bold tracking-tight text-destructive">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.suspendedDrivers || 0)}</div>
             </CardContent>
           </Card>
         </div>
@@ -385,7 +388,7 @@ export default function Drivers() {
             const expired = isLicenseExpired(driver.licenseExpiry);
             
             return (
-            <Card key={driver.id} className={`overflow-hidden ${driver.status === 'SUSPENDED' || expired ? 'border-destructive/50' : ''}`}>
+            <Card key={driver.id} className={`overflow-hidden ${bentoCardStyle} ${driver.status === 'SUSPENDED' || expired ? 'border-destructive/50' : ''}`}>
               <CardContent className="p-0">
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">

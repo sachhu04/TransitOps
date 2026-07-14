@@ -190,27 +190,32 @@ export default function Trips() {
     });
   };
 
+  const bentoCardStyle = "group hover:border-border/80 transition-all duration-300 hover:shadow-md flex flex-col";
+
   return (
     <>
       <Head>
         <title>Trips & Dispatch | TransitOps</title>
       </Head>
       
-      <div className="space-y-6 h-[calc(100vh-140px)] flex flex-col">
-        <div className="flex items-center justify-between">
-          <div>
+      <div className="flex-1 space-y-8 p-1 sm:p-4 h-[calc(100vh-140px)] flex flex-col">
+        {/* Classy Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border/60">
+          <div className="space-y-1.5">
             <h1 className="text-3xl font-bold tracking-tight">Trips & Dispatch</h1>
-            <p className="text-muted-foreground">Create new trips and monitor active dispatch operations.</p>
+            <p className="text-sm text-muted-foreground">Create new trips and monitor active dispatch operations.</p>
           </div>
-          <Button variant="outline" onClick={handleExportPDF}>
-            <Download className="mr-2 h-4 w-4" /> Export PDF
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleExportPDF}>
+              <Download className="mr-2 h-4 w-4" /> Export PDF
+            </Button>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6 flex-1 min-h-0">
           {/* Left Panel - Creation Form */}
           {canCreate ? (
-            <Card className="flex flex-col h-full overflow-hidden border-border shadow-sm">
+            <Card className={`flex flex-col h-full overflow-hidden border-border shadow-sm ${bentoCardStyle}`}>
               <CardHeader className="bg-muted/30 border-b border-border pb-4">
                 <CardTitle>Create New Trip</CardTitle>
                 <CardDescription>Enter trip details to assign a vehicle and driver.</CardDescription>
@@ -402,7 +407,7 @@ export default function Trips() {
 
           {/* Right Panel - Dispatch Board & History */}
           <Card className={cn(
-            "flex flex-col h-full overflow-hidden border-border shadow-sm bg-muted/10",
+            "flex flex-col h-full overflow-hidden border-border shadow-sm bg-muted/10", bentoCardStyle,
             canCreate ? "" : "lg:col-span-2"
           )}>
             <CardHeader className="bg-muted/30 border-b border-border pb-4">

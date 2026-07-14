@@ -46,16 +46,21 @@ export default function Settings() {
     }
   }, []);
 
+  const bentoCardStyle = "group hover:border-border/80 transition-all duration-300 hover:shadow-md flex flex-col";
+
   return (
     <>
       <Head>
         <title>Settings | TransitOps</title>
       </Head>
       
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground">Manage your account settings and preferences.</p>
+      <div className="flex-1 space-y-8 p-1 sm:p-4">
+        {/* Classy Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border/60">
+          <div className="space-y-1.5">
+            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+            <p className="text-sm text-muted-foreground">Manage your account settings and preferences.</p>
+          </div>
         </div>
 
         <Tabs defaultValue="general" className="space-y-6">
@@ -68,7 +73,7 @@ export default function Settings() {
           </TabsList>
           
           <TabsContent value="general" className="space-y-6">
-            <Card>
+            <Card className={bentoCardStyle}>
               <CardHeader>
                 <CardTitle>Company Information</CardTitle>
                 <CardDescription>Update your company details and primary depot location.</CardDescription>
@@ -91,7 +96,7 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className={bentoCardStyle}>
               <CardHeader>
                 <CardTitle>Preferences</CardTitle>
                 <CardDescription>Configure regional and measurement units.</CardDescription>
@@ -131,7 +136,7 @@ export default function Settings() {
             </div>
           </TabsContent>
           <TabsContent value="notifications" className="space-y-6">
-            <Card>
+            <Card className={bentoCardStyle}>
               <CardHeader>
                 <CardTitle>Email Notifications</CardTitle>
                 <CardDescription>Choose what updates you want to receive via email.</CardDescription>
@@ -158,7 +163,7 @@ export default function Settings() {
 
           {user?.role === 'ADMIN' && (
             <TabsContent value="team" className="space-y-6">
-              <Card>
+              <Card className={bentoCardStyle}>
                 <CardHeader>
                   <CardTitle>Invite New User</CardTitle>
                   <CardDescription>Generate a magic link to invite a new employee to TransitOps.</CardDescription>
@@ -221,7 +226,7 @@ export default function Settings() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className={bentoCardStyle}>
                 <CardHeader>
                   <CardTitle>Active Users</CardTitle>
                   <CardDescription>Manage active members of your organization.</CardDescription>
@@ -281,7 +286,7 @@ export default function Settings() {
               </Card>
 
               {invitations.length > 0 && (
-                <Card>
+                <Card className={bentoCardStyle}>
                   <CardHeader>
                     <CardTitle>Pending Invitations</CardTitle>
                     <CardDescription>Users who have been invited but haven't set up their accounts.</CardDescription>

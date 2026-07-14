@@ -2,16 +2,13 @@ import React from "react";
 import Head from "next/head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as RechartsTooltip, 
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  ComposedChart
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer
 } from "recharts";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -97,21 +94,24 @@ export default function Analytics() {
     });
   };
 
+  const bentoCardStyle = "group hover:border-border/80 transition-all duration-300 hover:shadow-md flex flex-col";
+
   return (
     <>
       <Head>
         <title>Reports & Analytics | TransitOps</title>
       </Head>
       
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
+      <div className="flex-1 space-y-8 p-1 sm:p-4">
+        {/* Classy Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border/60">
+          <div className="space-y-1.5">
             <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
-            <p className="text-muted-foreground">Comprehensive insights into fleet performance and costs.</p>
+            <p className="text-sm text-muted-foreground">Comprehensive insights into fleet performance and costs.</p>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger className={buttonVariants({ variant: "default" })}>
-              <Download className="mr-2 h-4 w-4" /> Export Report
+            <DropdownMenuTrigger className={buttonVariants({ variant: "outline" }) + " gap-2"}>
+              <Download className="h-4 w-4" /> Export Report
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleExportCSV}>Export as CSV</DropdownMenuItem>
@@ -120,75 +120,88 @@ export default function Analytics() {
           </DropdownMenu>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="border-t-4 border-t-primary">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-2">
+          <Card className={bentoCardStyle}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium uppercase text-muted-foreground">FUEL EFFICIENCY</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Fuel Efficiency</CardTitle>
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-24" /> : `${dashboard?.fuelEfficiency?.toFixed(1) || '0.0'} km/l`}</div>
+              <div className="text-3xl font-bold tracking-tight">{dashLoading ? <Skeleton className="h-8 w-24" /> : `${dashboard?.fuelEfficiency?.toFixed(1) || '0.0'} km/l`}</div>
             </CardContent>
           </Card>
           
-          <Card className="border-t-4 border-t-success">
+          <Card className={bentoCardStyle}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium uppercase text-muted-foreground">FLEET UTILIZATION</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Fleet Utilization</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-16" /> : `${dashboard?.fleetUtilization?.toFixed(0) || '0'}%`}</div>
+              <div className="text-3xl font-bold tracking-tight">{dashLoading ? <Skeleton className="h-8 w-16" /> : `${dashboard?.fleetUtilization?.toFixed(0) || '0'}%`}</div>
             </CardContent>
           </Card>
 
-          <Card className="border-t-4 border-t-destructive">
+          <Card className={bentoCardStyle}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium uppercase text-muted-foreground">OPERATIONAL COST</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Operational Cost</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-24" /> : `₹${(dashboard?.operationalCost || 0).toLocaleString()}`}</div>
+              <div className="text-3xl font-bold tracking-tight">{dashLoading ? <Skeleton className="h-8 w-24" /> : `₹${(dashboard?.operationalCost || 0).toLocaleString()}`}</div>
             </CardContent>
           </Card>
 
-          <Card className="border-t-4 border-t-info">
+          <Card className={bentoCardStyle}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium uppercase text-muted-foreground">VEHICLE ROI</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Vehicle ROI</CardTitle>
               <Percent className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{reportsLoading ? <Skeleton className="h-8 w-16" /> : `${avgRoi.toFixed(1)}%`}</div>
+              <div className="text-3xl font-bold tracking-tight">{reportsLoading ? <Skeleton className="h-8 w-16" /> : `${avgRoi.toFixed(1)}%`}</div>
               <p className="text-[10px] text-muted-foreground mt-1">
-                ROI = (Revenue − (Maintenance + Fuel)) / Acquisition Cost
+                (Rev − (Maint + Fuel)) / Acq Cost
               </p>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card className="col-span-2">
+          <Card className={`col-span-2 ${bentoCardStyle}`}>
             <CardHeader>
-              <CardTitle className="uppercase tracking-wider">MONTHLY REVENUE</CardTitle>
+              <CardTitle className="text-base font-semibold">Monthly Revenue</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={monthlyRevenueData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                    <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
-                    <RechartsTooltip contentStyle={{ borderRadius: '10px' }} formatter={(val) => `₹${(val as number).toLocaleString()}`} />
-                    <Bar dataKey="cost" fill="#FFA987" radius={[4, 4, 0, 0]} barSize={40} name="Cost" />
-                    <Line type="monotone" dataKey="revenue" stroke="#E54B4B" strokeWidth={3} name="Revenue" />
-                  </ComposedChart>
+                  <AreaChart data={monthlyRevenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorRevenueAnalytics" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#E54B4B" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#E54B4B" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorCostAnalytics" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                    <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val/1000}k`} dx={-10} />
+                    <RechartsTooltip 
+                      contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} 
+                      formatter={(val) => `₹${(val as number).toLocaleString()}`} 
+                    />
+                    <Area type="monotone" dataKey="revenue" stroke="#E54B4B" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenueAnalytics)" />
+                    <Area type="monotone" dataKey="cost" stroke="#94a3b8" strokeWidth={2} fillOpacity={1} fill="url(#colorCostAnalytics)" />
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className={bentoCardStyle}>
             <CardHeader>
-              <CardTitle className="uppercase tracking-wider">TOP COSTLIEST VEHICLES</CardTitle>
+              <CardTitle className="text-base font-semibold">Top Costliest Vehicles</CardTitle>
               <CardDescription>Vehicles with highest operational cost</CardDescription>
             </CardHeader>
             <CardContent>

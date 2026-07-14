@@ -124,22 +124,27 @@ export default function Maintenance() {
     });
   };
 
+  const bentoCardStyle = "group hover:border-border/80 transition-all duration-300 hover:shadow-md flex flex-col";
+
   return (
     <>
       <Head>
         <title>Maintenance | TransitOps</title>
       </Head>
       
-      <div className="space-y-6 h-[calc(100vh-140px)] flex flex-col">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Maintenance & Repairs</h1>
-          <p className="text-muted-foreground">Schedule service and view vehicle maintenance history.</p>
+      <div className="flex-1 space-y-8 p-1 sm:p-4 h-[calc(100vh-140px)] flex flex-col">
+        {/* Classy Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border/60">
+          <div className="space-y-1.5">
+            <h1 className="text-3xl font-bold tracking-tight">Maintenance & Repairs</h1>
+            <p className="text-sm text-muted-foreground">Schedule service and view vehicle maintenance history.</p>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 flex-1 min-h-0">
           {/* Left Panel - Schedule Form */}
           {user?.role !== 'FINANCIAL_ANALYST' && (
-            <Card className="flex flex-col h-full overflow-hidden border-border shadow-sm lg:col-span-1">
+            <Card className={`flex flex-col h-full overflow-hidden border-border shadow-sm lg:col-span-1 ${bentoCardStyle}`}>
             <CardHeader className="bg-muted/30 border-b border-border pb-4">
               <CardTitle>Schedule Service</CardTitle>
               <CardDescription>Log a new maintenance record or schedule an upcoming service.</CardDescription>
@@ -233,7 +238,7 @@ export default function Maintenance() {
 
           {/* Right Panel - Service History */}
           <Card className={cn(
-            "flex flex-col h-full overflow-hidden border-border shadow-sm bg-muted/10",
+            "flex flex-col h-full overflow-hidden border-border shadow-sm bg-muted/10", bentoCardStyle,
             user?.role === 'FINANCIAL_ANALYST' ? "lg:col-span-3" : "lg:col-span-2"
           )}>
             <CardHeader className="bg-muted/30 border-b border-border pb-4 flex flex-row items-center justify-between">
