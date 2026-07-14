@@ -30,6 +30,12 @@ Because TransitOps relies on a serverless architecture (Vercel), standard databa
 
    # Security Token
    JWT_SECRET="your_secure_jwt_secret"
+
+   # Email Configuration (Google OAuth2 for Nodemailer)
+   EMAIL_USER="your-email@gmail.com"
+   GMAIL_CLIENT_ID="your_google_client_id"
+   GMAIL_CLIENT_SECRET="your_google_client_secret"
+   GMAIL_REFRESH_TOKEN="your_google_refresh_token"
    ```
 
 2. **Install Dependencies**
@@ -56,10 +62,13 @@ Because TransitOps relies on a serverless architecture (Vercel), standard databa
 
 ## REST API Documentation
 
-### Authentication (`/api/auth`)
-- `POST /api/auth/login`: Authenticates user credentials.
-  - Body: `{ email, password, role }`
-  - Returns: `{ token, user: { id, name, email, role } }`
+### Authentication & Users (`/api/auth` & `/api/users`)
+- `POST /api/auth/login`: Authenticates user credentials and provisions a JWT.
+- `POST /api/auth/register`: (Admin Only) Creates an invitation in an isolated `Invitation` table and dispatches a magic setup link via Google OAuth2 Nodemailer.
+- `POST /api/auth/setup-account`: Consumes an invitation token to finalize user creation and set passwords.
+- `POST /api/auth/forgot-password`: Generates a rate-limited (15-min) and cryptographically hashed password reset token.
+- `POST /api/auth/reset-password`: Consumes a reset token to update user credentials securely.
+- `DELETE /api/users`: (Admin Only) Hard-deletes users from the database, cascading cleanup.
 
 ### Dashboard (`/api/dashboard`)
 - `GET /api/dashboard`: Aggregates and returns top-level Key Performance Indicators (Active Vehicles, Active Trips, Utilization, Fuel Efficiency).

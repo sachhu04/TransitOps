@@ -70,8 +70,14 @@
 - **Analytics & Reports**<br/>
   Exportable comprehensive reports (PDF & CSV) for fuel efficiency, ROI, and top costliest vehicles.
 
+- **Enterprise Authentication & Invitations**<br/>
+  Secure "magic link" email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database rate limiting.
+
+- **Production Email Infrastructure**<br/>
+  Automated server-to-server email dispatch using Google OAuth2 (Client ID & Refresh Token) to bypass cloud SMTP blocking heuristics on Vercel.
+
 - **Role-Based Access Control (RBAC)**<br/>
-  Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT.
+  Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT. Advanced admin capabilities for permanent user deletion and team management.
 
 <br/>
 
