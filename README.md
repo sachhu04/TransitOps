@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=2563eb&height=250&section=header&text=TransitOps&fontSize=70&fontColor=ffffff&animation=fadeIn" alt="TransitOps Banner" />
 
-  <h3 align="center">A Modern Fleet & Logistics Management SaaS Platform</h3>
+  <h3 align="center">Enterprise Fleet & Logistics Management Platform</h3>
 
   <p align="center">
     <strong>Built for the Odoo Hackathon</strong>
@@ -19,13 +19,13 @@
   </p>
 </div>
 
-<br/>
+---
 
 ## Overview
 
 **TransitOps** is a comprehensive, end-to-end Fleet and Logistics Management platform. Built for the Odoo Hackathon, it provides a centralized dashboard to seamlessly manage vehicles, drivers, trips, maintenance, and expenses with built-in Role-Based Access Control (RBAC).
 
-<br/>
+---
 
 ## Tech Stack
 
@@ -44,44 +44,44 @@
   <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
 </div>
 
-<br/>
+---
 
 ## Features
 
-- **Interactive Dashboard**<br/>
-  High-level KPIs, fleet utilization, active trip tracking, and beautifully rendered charts.
+**Interactive Dashboard**  
+High-level KPIs, fleet utilization, active trip tracking, and beautifully rendered charts.
 
-- **Fleet Management**<br/>
-  Track vehicle status, health scores, mileage, and maintenance logs in real time.
+**Enterprise Authentication & Invitations**  
+Secure "magic link" email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database-level rate limiting.
 
-- **Driver Management**<br/>
-  Manage driver profiles, licenses, safety scores, and duty availability.
+**Production Email Infrastructure**  
+Automated server-to-server email dispatch using Google OAuth2 (Client ID & Refresh Token) to bypass cloud SMTP blocking heuristics on Vercel.
 
-- **Smart Notification Center**<br/>
-  Real-time in-app alerts for expiring driver licenses, pending trips, and vehicles requiring maintenance.
+**Fleet Management**  
+Track vehicle status, health scores, mileage, and maintenance logs in real time.
 
-- **Dynamic Initialization & Glassmorphic UI**<br/>
-  A sleek, modern interface utilizing Space Grotesk typography, glassmorphism (`backdrop-blur`), and a dynamic database-synced splash screen.
+**Driver Management**  
+Manage driver profiles, licenses, safety scores, and duty availability.
 
-- **Trip Lifecycle Management**<br/>
-  Dispatch, track, and complete trips with real-time status updates from `DRAFT` to `COMPLETED`.
+**Smart Notification Center**  
+Real-time in-app alerts for expiring driver licenses, pending trips, and vehicles requiring maintenance.
 
-- **Maintenance & Fuel Logs**<br/>
-  Record maintenance costs, log fuel expenses, and track overall operational efficiency.
+**Dynamic Initialization & Glassmorphic UI**  
+A sleek, modern interface utilizing Space Grotesk typography, glassmorphism, and a dynamic database-synced splash screen.
 
-- **Analytics & Reports**<br/>
-  Exportable comprehensive reports (PDF & CSV) for fuel efficiency, ROI, and top costliest vehicles.
+**Trip Lifecycle Management**  
+Dispatch, track, and complete trips with real-time status updates from `DRAFT` to `COMPLETED`.
 
-- **Enterprise Authentication & Invitations**<br/>
-  Secure "magic link" email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database rate limiting.
+**Maintenance & Fuel Logs**  
+Record maintenance costs, log fuel expenses, and track overall operational efficiency.
 
-- **Production Email Infrastructure**<br/>
-  Automated server-to-server email dispatch using Google OAuth2 (Client ID & Refresh Token) to bypass cloud SMTP blocking heuristics on Vercel.
+**Analytics & Reports**  
+Exportable comprehensive reports (PDF & CSV) for fuel efficiency, ROI, and top costliest vehicles.
 
-- **Role-Based Access Control (RBAC)**<br/>
-  Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT. Advanced admin capabilities for permanent user deletion and team management.
+**Role-Based Access Control (RBAC)**  
+Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT. Advanced admin capabilities for permanent user deletion and team management.
 
-<br/>
+---
 
 ## System Design
 
@@ -105,7 +105,7 @@ graph TD
 
 ### Entity Relationship Schema
 
-Our data model is highly relational, connecting vehicles to trips, maintenance, fuel, and expenses, allowing for deep analytics on operational costs.
+The data model is highly relational, connecting vehicles to trips, maintenance, fuel, and expenses, allowing for deep analytics on operational costs. It also strictly isolates authentication lifecycles (Invitations, Rate Limits).
 
 ```mermaid
 erDiagram
@@ -114,17 +114,27 @@ erDiagram
         String email UK
         String name
         Role role
+        String resetToken
+    }
+    Invitation {
+        String id PK
+        String email UK
+        String token UK
+        DateTime expiresAt
+    }
+    RateLimit {
+        String id PK
+        String identifier
+        String action
     }
     Vehicle {
         String id PK
         String registration UK
-        String type
         VehicleStatus status
         Float healthScore
     }
     Driver {
         String id PK
-        String name
         String licenseNumber UK
         Float safetyScore
         DriverStatus status
@@ -149,8 +159,13 @@ erDiagram
     }
     Expense {
         String id PK
-        String type
+        ExpenseCategory type
         Float amount
+    }
+    ActivityLog {
+        String id PK
+        String action
+        String entity
     }
 
     Vehicle ||--o{ Trip : makes
@@ -159,9 +174,10 @@ erDiagram
     Vehicle ||--o{ FuelLog : has
     Vehicle ||--o{ Expense : incurs
     Trip ||--o{ Expense : incurs
+    User ||--o{ ActivityLog : generates
 ```
 
-<br/>
+---
 
 ## Getting Started
 
@@ -176,11 +192,17 @@ Clone the repository and install dependencies:
 npm install
 ```
 
-Ensure you have a running PostgreSQL instance. Update the `DATABASE_URL`, `DIRECT_URL`, and `JWT_SECRET` in the `.env` file at the root of the project:
+Ensure you have a running PostgreSQL instance. Update the environment variables in the `.env` file at the root of the project:
 ```env
 DATABASE_URL="postgresql://postgres:[PASSWORD]@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
 DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres"
 JWT_SECRET="supersecret_jwt_key_transitops_hackathon_2026"
+
+# Email Configuration (Google OAuth2 for Nodemailer)
+EMAIL_USER="your-email@gmail.com"
+GMAIL_CLIENT_ID="your_google_client_id"
+GMAIL_CLIENT_SECRET="your_google_client_secret"
+GMAIL_REFRESH_TOKEN="your_google_refresh_token"
 ```
 
 ### 2. Database Initialization
@@ -195,7 +217,6 @@ Seed the database with default roles, vehicles, and mock data:
 ```bash
 npm run seed
 ```
-> **Note**: This will automatically populate the database with default users and mock data so you can immediately interact with the dashboard.
 
 ### 3. Default Credentials for Evaluator
 
@@ -207,6 +228,7 @@ You can use the following default credentials to log in and test different RBAC 
 | **Dispatcher** | `dispatcher@transitops.in` | `password123` |
 | **Safety Officer** | `safety@transitops.in` | `password123` |
 | **Financial Analyst** | `finance@transitops.in` | `password123` |
+| **Admin** | `admin@transitops.in` | `password123` |
 
 ### 4. Start Development Server
 
@@ -216,13 +238,13 @@ npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser to view the application.
 
-<br/>
+---
 
 ## API & Backend Documentation
 
 For detailed backend integration notes, API endpoints, and authentication workflows, refer to the [Backend README](./README-BACKEND.md).
 
-<br/>
+---
 
 ## License
 
