@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CommandMenu } from "@/components/ui/command-menu";
 
 export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
   const [user, setUser] = useState<{name: string; role: string} | null>(null);
@@ -77,11 +78,7 @@ export default function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
           <Menu className="w-5 h-5" />
         </Button>
         <div className="relative max-w-md w-full hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search shipments, vehicles, drivers..." 
-            className="pl-10 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary/50"
-          />
+          <CommandMenu />
         </div>
       </div>
 

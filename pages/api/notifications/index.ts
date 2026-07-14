@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const fetchPromises = [];
 
-      if (['SAFETY_OFFICER', 'FLEET_MANAGER'].includes(user.role)) {
+      if (['SAFETY_OFFICER', 'FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
         fetchPromises.push(
           prisma.driver.findMany({
             where: { licenseExpiry: { lte: thirtyDaysFromNow }, isArchived: false },
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
       }
 
-      if (['FLEET_MANAGER'].includes(user.role)) {
+      if (['FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
         fetchPromises.push(
           prisma.vehicle.findMany({
             where: { status: 'IN_SHOP' },
@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
       }
 
-      if (['DISPATCHER', 'FLEET_MANAGER'].includes(user.role)) {
+      if (['DISPATCHER', 'FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
         fetchPromises.push(
           prisma.trip.count({
             where: { status: { in: ['DRAFT', 'ASSIGNED'] } }

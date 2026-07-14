@@ -238,9 +238,13 @@ export default function Login() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password">Password</Label>
-                      <a href="#" className="text-sm font-medium text-primary hover:underline">
+                      <button 
+                        type="button" 
+                        onClick={() => alert("Please contact your IT Administrator. They can generate a secure password reset link for you from the Team Management dashboard.")}
+                        className="text-sm font-medium text-primary hover:underline"
+                      >
                         Forgot password?
-                      </a>
+                      </button>
                     </div>
                     <div className="relative">
                       <Input 
@@ -275,6 +279,7 @@ export default function Login() {
                         <SelectValue placeholder="Select your role" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
                         <SelectItem value="FLEET_MANAGER">Fleet Manager</SelectItem>
                         <SelectItem value="DISPATCHER">Dispatcher</SelectItem>
                         <SelectItem value="SAFETY_OFFICER">Safety Officer</SelectItem>

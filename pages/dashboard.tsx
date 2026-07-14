@@ -55,6 +55,18 @@ export default function Dashboard() {
   const [vehicleType, setVehicleType] = useState('all');
   const [status, setStatus] = useState('all');
   const [region, setRegion] = useState('all');
+  const [user, setUser] = useState<{name: string; role: string} | null>(null);
+
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {}
+    }
+  }, []);
+
+  const canCreateTrip = user?.role === 'ADMIN' || user?.role === 'DISPATCHER';
 
   const queryParams = new URLSearchParams();
   if (vehicleType !== 'all') queryParams.append('type', vehicleType);
@@ -157,9 +169,11 @@ export default function Dashboard() {
                 <DropdownMenuItem onClick={exportPDF}>Download PDF</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Link href="/trips">
-              <Button>New Dispatch</Button>
-            </Link>
+            {canCreateTrip && (
+              <Link href="/trips">
+                <Button>New Dispatch</Button>
+              </Link>
+            )}
           </div>
         </div>
 

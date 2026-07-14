@@ -25,6 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ message: 'Selected role does not match assigned role' });
     }
 
+    if (!user.password) {
+      return res.status(401).json({ message: 'Account not set up. Please use your invite link to create a password.' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });

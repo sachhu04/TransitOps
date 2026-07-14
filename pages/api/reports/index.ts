@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return requireAuth(async (req, res, user) => {
-    if (!['FLEET_MANAGER', 'FINANCIAL_ANALYST'].includes(user.role)) {
+    if (!['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'ADMIN'].includes(user.role)) {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
     }
     try {

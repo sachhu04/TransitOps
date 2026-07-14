@@ -76,7 +76,7 @@ export default function Trips() {
     }
   }, []);
 
-  const canCreate = user?.role === 'DISPATCHER';
+  const canCreate = user?.role === 'DISPATCHER' || user?.role === 'ADMIN';
   
   const form = useForm<TripFormValues>({
     resolver: zodResolver(tripSchema) as any,
@@ -401,7 +401,10 @@ export default function Trips() {
           )}
 
           {/* Right Panel - Dispatch Board & History */}
-          <Card className="flex flex-col h-full overflow-hidden border-border shadow-sm bg-muted/10">
+          <Card className={cn(
+            "flex flex-col h-full overflow-hidden border-border shadow-sm bg-muted/10",
+            canCreate ? "" : "lg:col-span-2"
+          )}>
             <CardHeader className="bg-muted/30 border-b border-border pb-4">
               <CardTitle>Dispatch Operations</CardTitle>
               <CardDescription>Monitor active operations and past history.</CardDescription>

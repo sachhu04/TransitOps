@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import { Save, Check, Minus } from "lucide-react";
+import { Save, Check, Minus, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 
 export default function Settings() {
+  const [user, setUser] = useState<{name: string; role: string} | null>(null);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [resetLink, setResetLink] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user from local storage");
+      }
+    }
+  }, []);
+
   return (
     <>
       <Head>
@@ -27,7 +42,9 @@ export default function Settings() {
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="roles">Roles & Permissions</TabsTrigger>
+            {user?.role === 'ADMIN' && (
+              <TabsTrigger value="team">Team Management</TabsTrigger>
+            )}
           </TabsList>
           
           <TabsContent value="general" className="space-y-6">
@@ -93,7 +110,6 @@ export default function Settings() {
               </Button>
             </div>
           </TabsContent>
-
           <TabsContent value="notifications" className="space-y-6">
             <Card>
               <CardHeader>
@@ -119,63 +135,145 @@ export default function Settings() {
               </CardContent>
             </Card>
           </TabsContent>
-          
-          <TabsContent value="roles" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Role Based Access Control</CardTitle>
-                <CardDescription>Manage what each role can view and edit.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[200px]">ROLE</TableHead>
-                      <TableHead>FLEET</TableHead>
-                      <TableHead>DRIVERS</TableHead>
-                      <TableHead>TRIPS</TableHead>
-                      <TableHead>FUEL/EXP.</TableHead>
-                      <TableHead>ANALYTICS</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Fleet Manager</TableCell>
-                      <TableCell><Check className="h-4 w-4" /></TableCell>
-                      <TableCell><Check className="h-4 w-4" /></TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Check className="h-4 w-4" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Dispatcher</TableCell>
-                      <TableCell>View</TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Check className="h-4 w-4" /></TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Safety Officer</TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Check className="h-4 w-4" /></TableCell>
-                      <TableCell>View</TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Financial Analyst</TableCell>
-                      <TableCell>View</TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Minus className="h-4 w-4" /></TableCell>
-                      <TableCell><Check className="h-4 w-4" /></TableCell>
-                      <TableCell><Check className="h-4 w-4" /></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
+          {user?.role === 'ADMIN' && (
+            <TabsContent value="team" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Invite New User</CardTitle>
+                  <CardDescription>Generate a magic link to invite a new employee to TransitOps.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form 
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const formData = new FormData(form);
+                      const name = formData.get('name') as string;
+                      const email = formData.get('email') as string;
+                      const role = formData.get('role') as string;
+                      
+                      try {
+                        const res = await fetch('/api/auth/register', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                          },
+                          body: JSON.stringify({ name, email, role })
+                        });
+                        
+                        const data = await res.json();
+                        if (res.ok) {
+                          setInviteLink(data.inviteLink);
+                          form.reset();
+                        } else {
+                          alert(`Error: ${data.message}`);
+                        }
+                      } catch (error) {
+                        alert('Failed to invite user');
+                      }
+                    }}
+                    className="space-y-4 max-w-md"
+                  >
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" name="name" required placeholder="John Doe" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input id="email" name="email" type="email" required placeholder="john@transitops.in" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Role</Label>
+                      <select id="role" name="role" required className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="FLEET_MANAGER">Fleet Manager</option>
+                        <option value="DISPATCHER">Dispatcher</option>
+                        <option value="SAFETY_OFFICER">Safety Officer</option>
+                        <option value="FINANCIAL_ANALYST">Financial Analyst</option>
+                      </select>
+                    </div>
+                    <Button type="submit" className="w-full">
+                      Generate Invite Link
+                    </Button>
+                  </form>
+                  
+                  {inviteLink && (
+                    <div className="mt-6 p-4 border border-primary/20 bg-primary/5 rounded-lg space-y-2">
+                      <Label className="text-primary font-semibold">User invited successfully!</Label>
+                      <p className="text-sm text-muted-foreground">Copy the magic link below and send it to the employee so they can set up their account and password.</p>
+                      <div className="flex gap-2">
+                        <Input readOnly value={inviteLink} className="bg-background font-mono text-xs" />
+                        <Button variant="outline" size="icon" onClick={() => navigator.clipboard.writeText(inviteLink)}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Reset User Password</CardTitle>
+                  <CardDescription>Generate a reset link for an existing user who forgot their password.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form 
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const formData = new FormData(form);
+                      const email = formData.get('resetEmail') as string;
+                      
+                      try {
+                        const res = await fetch('/api/auth/generate-reset', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                          },
+                          body: JSON.stringify({ email })
+                        });
+                        
+                        const data = await res.json();
+                        if (res.ok) {
+                          setResetLink(data.resetLink);
+                          form.reset();
+                        } else {
+                          alert(`Error: ${data.message}`);
+                        }
+                      } catch (error) {
+                        alert('Failed to generate reset link');
+                      }
+                    }}
+                    className="space-y-4 max-w-md"
+                  >
+                    <div className="space-y-2">
+                      <Label htmlFor="resetEmail">Employee Email Address</Label>
+                      <Input id="resetEmail" name="resetEmail" type="email" required placeholder="john@transitops.in" />
+                    </div>
+                    <Button type="submit" variant="secondary" className="w-full">
+                      Generate Reset Link
+                    </Button>
+                  </form>
+                  
+                  {resetLink && (
+                    <div className="mt-6 p-4 border border-primary/20 bg-primary/5 rounded-lg space-y-2">
+                      <Label className="text-primary font-semibold">Reset Link Generated</Label>
+                      <p className="text-sm text-muted-foreground">Copy the link below and send it to the employee.</p>
+                      <div className="flex gap-2">
+                        <Input readOnly value={resetLink} className="bg-background font-mono text-xs" />
+                        <Button variant="outline" size="icon" onClick={() => navigator.clipboard.writeText(resetLink)}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </>

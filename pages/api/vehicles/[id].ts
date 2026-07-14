@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'GET') {
-      if (!['FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST'].includes(user.role)) {
+      if (!['FLEET_MANAGER', 'DISPATCHER', 'FINANCIAL_ANALYST', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ message: 'Internal server error' });
       }
     } else if (req.method === 'PUT') {
-      if (user.role !== 'FLEET_MANAGER') {
+      if (user.role !== 'FLEET_MANAGER' && user.role !== 'ADMIN') {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {
@@ -63,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ message: 'Internal server error' });
       }
     } else if (req.method === 'PATCH') {
-      if (user.role !== 'FLEET_MANAGER') {
+      if (user.role !== 'FLEET_MANAGER' && user.role !== 'ADMIN') {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {

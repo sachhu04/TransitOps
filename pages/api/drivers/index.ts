@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 const createDriverSchema = z.object({
   name: z.string().min(1, 'Full Name is required'),
-  licenseNumber: z.string().min(1, 'License Number is required'),
+  licenseNumber: z.string().regex(/^[A-Z]{2}[0-9]{2} ?[0-9]{11}$/i, 'Invalid Indian Driving License format'),
   licenseCategory: z.string().min(1, 'License Category is required'),
   licenseExpiry: z.string().or(z.date()),
   contactNumber: z.string().regex(/^(?:\+91)?[6-9]\d{9}$/, 'Invalid Indian mobile number'),
@@ -16,7 +16,7 @@ const createDriverSchema = z.object({
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   return requireAuth(async (req, res, user) => {
     if (req.method === 'GET') {
-      if (!['FLEET_MANAGER', 'SAFETY_OFFICER', 'DISPATCHER'].includes(user.role)) {
+      if (!['FLEET_MANAGER', 'SAFETY_OFFICER', 'DISPATCHER', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {
@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ message: 'Internal server error' });
       }
     } else if (req.method === 'POST') {
-      if (!['FLEET_MANAGER', 'SAFETY_OFFICER'].includes(user.role)) {
+      if (!['FLEET_MANAGER', 'SAFETY_OFFICER', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {

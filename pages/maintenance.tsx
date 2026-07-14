@@ -23,6 +23,17 @@ export default function Maintenance() {
   const vehicles = Array.isArray(vehiclesData) ? vehiclesData : [];
   const logs = Array.isArray(logsData) ? logsData : [];
   
+  const [user, setUser] = React.useState<{name: string; role: string} | null>(null);
+
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {}
+    }
+  }, []);
+  
   const [vehicleOpen, setVehicleOpen] = React.useState(false);
   const [selectedVehicle, setSelectedVehicle] = React.useState<string>("");
   const [service, setService] = React.useState("");
@@ -127,7 +138,8 @@ export default function Maintenance() {
 
         <div className="grid lg:grid-cols-3 gap-6 flex-1 min-h-0">
           {/* Left Panel - Schedule Form */}
-          <Card className="flex flex-col h-full overflow-hidden border-border shadow-sm lg:col-span-1">
+          {user?.role !== 'FINANCIAL_ANALYST' && (
+            <Card className="flex flex-col h-full overflow-hidden border-border shadow-sm lg:col-span-1">
             <CardHeader className="bg-muted/30 border-b border-border pb-4">
               <CardTitle>Schedule Service</CardTitle>
               <CardDescription>Log a new maintenance record or schedule an upcoming service.</CardDescription>
@@ -216,10 +228,14 @@ export default function Maintenance() {
                 {isSubmitting ? "Saving..." : "Save Record"}
               </Button>
             </div>
-          </Card>
+            </Card>
+          )}
 
           {/* Right Panel - Service History */}
-          <Card className="flex flex-col h-full overflow-hidden border-border shadow-sm lg:col-span-2 bg-muted/10">
+          <Card className={cn(
+            "flex flex-col h-full overflow-hidden border-border shadow-sm bg-muted/10",
+            user?.role === 'FINANCIAL_ANALYST' ? "lg:col-span-3" : "lg:col-span-2"
+          )}>
             <CardHeader className="bg-muted/30 border-b border-border pb-4 flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Service History</CardTitle>
@@ -281,12 +297,12 @@ export default function Maintenance() {
                             }`}>
                               {log.status.replace('_', ' ')}
                             </span>
-                            {log.status === 'IN_PROGRESS' && (
+                            {log.status === 'IN_PROGRESS' && user?.role !== 'FINANCIAL_ANALYST' && (
                               <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => updateLogStatus(log.id, 'COMPLETED')}>
                                 <CheckCircle2 className="w-3 h-3 mr-1" /> Mark Done
                               </Button>
                             )}
-                            {log.status === 'SCHEDULED' && (
+                            {log.status === 'SCHEDULED' && user?.role !== 'FINANCIAL_ANALYST' && (
                               <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => updateLogStatus(log.id, 'IN_PROGRESS')}>
                                 <Wrench className="w-3 h-3 mr-1" /> Start
                               </Button>

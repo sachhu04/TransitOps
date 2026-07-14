@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'GET') {
-      if (!['FLEET_MANAGER', 'SAFETY_OFFICER'].includes(user.role)) {
+      if (!['FLEET_MANAGER', 'SAFETY_OFFICER', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ message: 'Internal server error' });
       }
     } else if (req.method === 'PUT') {
-      if (!['FLEET_MANAGER', 'SAFETY_OFFICER'].includes(user.role)) {
+      if (!['FLEET_MANAGER', 'SAFETY_OFFICER', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {
@@ -75,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ message: 'Failed to update driver.' });
       }
     } else if (req.method === 'PATCH') {
-      if (!['FLEET_MANAGER', 'SAFETY_OFFICER'].includes(user.role)) {
+      if (!['FLEET_MANAGER', 'SAFETY_OFFICER', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {

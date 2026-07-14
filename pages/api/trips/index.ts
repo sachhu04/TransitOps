@@ -5,7 +5,7 @@ import { requireAuth } from '../../../lib/auth';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   return requireAuth(async (req, res, user) => {
     if (req.method === 'GET') {
-      if (!['DISPATCHER', 'SAFETY_OFFICER', 'FLEET_MANAGER'].includes(user.role)) {
+      if (!['DISPATCHER', 'SAFETY_OFFICER', 'FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {
@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ message: 'Internal server error' });
       }
     } else if (req.method === 'POST') {
-      if (!['DISPATCHER'].includes(user.role)) {
+      if (!['DISPATCHER', 'ADMIN'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {

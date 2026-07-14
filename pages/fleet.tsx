@@ -278,7 +278,7 @@ export default function Fleet() {
       }
     ];
 
-    if (user?.role === 'FLEET_MANAGER') {
+    if (user?.role !== 'FINANCIAL_ANALYST') {
       cols.push({
         id: "actions",
         enableHiding: false,
@@ -374,7 +374,7 @@ export default function Fleet() {
             <Button variant="outline" onClick={handleExportPDF}>
               <Download className="mr-2 h-4 w-4" /> Export PDF
             </Button>
-            {user?.role === 'FLEET_MANAGER' && (
+            {user?.role !== 'FINANCIAL_ANALYST' && (
               <Button onClick={handleOpenAddDialog}>
                 <Plus className="mr-2 h-4 w-4" /> Add Vehicle
               </Button>

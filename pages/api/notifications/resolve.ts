@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       if (notificationId.startsWith('driver-')) {
-        if (!['SAFETY_OFFICER', 'FLEET_MANAGER'].includes(user.role)) {
+        if (!['SAFETY_OFFICER', 'FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
           return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
         }
 
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json({ message: 'License renewed successfully' });
       } 
       else if (notificationId.startsWith('vehicle-')) {
-        if (!['FLEET_MANAGER'].includes(user.role)) {
+        if (!['FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
           return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
         }
 
@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json({ message: 'Vehicle marked as available' });
       }
       else if (notificationId === 'pending-trips') {
-        if (!['DISPATCHER', 'FLEET_MANAGER'].includes(user.role)) {
+        if (!['DISPATCHER', 'FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
           return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
         }
         

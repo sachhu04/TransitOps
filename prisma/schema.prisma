@@ -12,6 +12,7 @@ datasource db {
 }
 
 enum Role {
+  ADMIN
   FLEET_MANAGER
   DISPATCHER
   SAFETY_OFFICER
@@ -19,13 +20,16 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(FLEET_MANAGER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(cuid())
+  email          String    @unique
+  password       String?
+  name           String
+  role           Role      @default(FLEET_MANAGER)
+  inviteToken    String?   @unique
+  resetToken     String?   @unique
+  tokenExpiresAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 enum VehicleStatus {

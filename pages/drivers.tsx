@@ -65,7 +65,8 @@ export default function Drivers() {
     }
   }, []);
 
-  const canManage = user?.role === 'FLEET_MANAGER' || user?.role === 'SAFETY_OFFICER';
+  const canAddDriver = user?.role === 'ADMIN' || user?.role === 'FLEET_MANAGER';
+  const canEditDriver = user?.role === 'ADMIN' || user?.role === 'FLEET_MANAGER' || user?.role === 'SAFETY_OFFICER';
   
   const queryUrl = `/api/drivers?search=${encodeURIComponent(search)}&status=${statusFilter}&sort=${sortBy}`;
   const { data: drivers, mutate, error, isLoading } = useSWR(queryUrl, fetcher);
@@ -202,7 +203,7 @@ export default function Drivers() {
             <Button variant="outline" onClick={handleExportPDF}>
               <Download className="mr-2 h-4 w-4" /> Export PDF
             </Button>
-            {canManage && (
+            {canAddDriver && (
               <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                 <DialogTrigger>
                   <div onClick={() => setFormData({ name: "", licenseNumber: "", licenseCategory: "", licenseExpiry: "", contactNumber: "", safetyScore: 100, status: "AVAILABLE" })} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
@@ -226,7 +227,7 @@ export default function Drivers() {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">License Number</label>
-                        <Input required placeholder="MH1420210009823" value={formData.licenseNumber} onChange={e => setFormData({...formData, licenseNumber: e.target.value})} />
+                        <Input required placeholder="MH1420210009823" value={formData.licenseNumber} onChange={e => setFormData({...formData, licenseNumber: e.target.value.toUpperCase()})} pattern="^[A-Za-z]{2}[0-9]{2} ?[0-9]{11}$" title="Indian Driving License (e.g. MH1420210009823)" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">License Category</label>
@@ -406,7 +407,7 @@ export default function Drivers() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleOpenView(driver)}>View Profile</DropdownMenuItem>
-                        {canManage && (
+                        {canEditDriver && (
                           <>
                             <DropdownMenuItem onClick={() => handleOpenEdit(driver)}>Edit Driver</DropdownMenuItem>
                             <DropdownMenuItem className="text-destructive" onClick={() => handleOpenDelete(driver)}>Archive Driver</DropdownMenuItem>
@@ -482,7 +483,7 @@ export default function Drivers() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">License Number</label>
-                  <Input required placeholder="MH1420210009823" value={formData.licenseNumber} onChange={e => setFormData({...formData, licenseNumber: e.target.value})} />
+                  <Input required placeholder="MH1420210009823" value={formData.licenseNumber} onChange={e => setFormData({...formData, licenseNumber: e.target.value.toUpperCase()})} pattern="^[A-Za-z]{2}[0-9]{2} ?[0-9]{11}$" title="Indian Driving License (e.g. MH1420210009823)" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">License Category</label>
