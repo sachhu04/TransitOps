@@ -2,9 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { sendEmail } from '../../../lib/email';
+import crypto from 'crypto';
 
 const resetSchema = z.object({
   token: z.string().min(1, 'Token is required'),
@@ -23,15 +22,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const { token, password } = validation.data;
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    const user = await prisma.user.findUnique({ where: { resetToken: token } });
+    const user = await prisma.user.findUnique({ where: { resetToken: hashedToken } });
     
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired reset token' });
     }
 
     if (user.tokenExpiresAt && user.tokenExpiresAt < new Date()) {
-      return res.status(400).json({ message: 'Reset token has expired. Please contact your administrator.' });
+      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,9 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Send confirmation email
-    await resend.emails.send({
-      from: 'TransitOps <notifications@resend.dev>',
-      to: [user.email],
+    await sendEmail({
+      to: user.email,
       subject: 'TransitOps Password Reset Successfully',
       html: `
         <h1>Password Reset Complete</h1>

@@ -21,6 +21,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    if (user.isArchived) {
+      return res.status(401).json({ message: 'Account has been deactivated' });
+    }
+
     if (user.role !== role) {
       return res.status(403).json({ message: 'Selected role does not match assigned role' });
     }

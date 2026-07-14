@@ -34,22 +34,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ message: 'A user with this email already exists' });
       }
 
-      const inviteToken = crypto.randomBytes(32).toString('hex');
-      const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-      const newUser = await prisma.user.create({
-        data: {
+      await prisma.invitation.upsert({
+        where: { email },
+        update: {
           name,
-          email,
           role,
-          inviteToken,
-          tokenExpiresAt,
+          token: hashedToken,
+          expiresAt,
+          invitedBy: user.id,
+        },
+        create: {
+          email,
+          name,
+          role,
+          token: hashedToken,
+          expiresAt,
+          invitedBy: user.id,
         },
       });
 
       // Construct magic link
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${req.headers.host}`;
-      const inviteLink = `${baseUrl}/setup-account?token=${inviteToken}`;
+      const inviteLink = `${baseUrl}/setup-account?token=${rawToken}`;
 
       // Send email
       const { success, error } = await sendEmail({
@@ -71,13 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       return res.status(201).json({
-        message: 'User invited successfully',
-        user: {
-          id: newUser.id,
-          name: newUser.name,
-          email: newUser.email,
-          role: newUser.role,
-        }
+        message: 'User invited successfully'
       });
     } catch (error) {
       console.error('Registration error:', error);

@@ -8,6 +8,8 @@ const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
 });
 
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
@@ -21,6 +23,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { email } = validation.data;
 
+    // Rate Limiting Check
+    const rateLimitCheck = await prisma.rateLimit.findFirst({
+      where: {
+        identifier: email,
+        action: 'PASSWORD_RESET',
+        createdAt: {
+          gt: new Date(Date.now() - RATE_LIMIT_WINDOW_MS),
+        },
+      },
+    });
+
+    if (rateLimitCheck) {
+      // To prevent enumeration, still return 200, but don't process
+      return res.status(200).json({
+        message: 'If an account with that email exists, we have sent a password reset link to it.',
+      });
+    }
+
+    // Record this attempt
+    await prisma.rateLimit.create({
+      data: {
+        identifier: email,
+        action: 'PASSWORD_RESET',
+      },
+    });
+
     const targetUser = await prisma.user.findUnique({ where: { email } });
     
     // We always return 200 to prevent User Enumeration, even if the user doesn't exist.
@@ -30,20 +58,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     await prisma.user.update({
       where: { id: targetUser.id },
       data: {
-        resetToken,
+        resetToken: hashedToken,
         tokenExpiresAt,
       },
     });
 
     // Construct magic link
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${req.headers.host}`;
-    const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
+    const resetLink = `${baseUrl}/reset-password?token=${rawToken}`;
 
     // Send email using Nodemailer
     const { success, error } = await sendEmail({

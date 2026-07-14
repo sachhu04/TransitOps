@@ -3,6 +3,7 @@ import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sendEmail } from '../../../lib/email';
+import crypto from 'crypto';
 
 const setupSchema = z.object({
   token: z.string().min(1, 'Token is required'),
@@ -21,27 +22,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const { token, password } = validation.data;
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    const user = await prisma.user.findUnique({ where: { inviteToken: token } });
+    const invitation = await prisma.invitation.findUnique({ where: { token: hashedToken } });
     
-    if (!user) {
+    if (!invitation) {
       return res.status(400).json({ message: 'Invalid or expired invite token' });
     }
 
-    if (user.tokenExpiresAt && user.tokenExpiresAt < new Date()) {
+    if (invitation.expiresAt < new Date()) {
       return res.status(400).json({ message: 'Invite token has expired. Please contact your administrator.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.user.update({
-      where: { id: user.id },
+    const user = await prisma.user.create({
       data: {
+        email: invitation.email,
+        name: invitation.name,
+        role: invitation.role,
         password: hashedPassword,
-        inviteToken: null,
-        tokenExpiresAt: null,
       },
     });
+
+    await prisma.invitation.delete({ where: { id: invitation.id } });
 
     // Send confirmation email
     await sendEmail({

@@ -13,13 +13,33 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Settings() {
   const [user, setUser] = useState<{name: string; role: string} | null>(null);
-
+  const [teamUsers, setTeamUsers] = useState<any[]>([]);
+  const [invitations, setInvitations] = useState<any[]>([]);
+  
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('/api/users', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTeamUsers(data.users || []);
+        setInvitations(data.invitations || []);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
+        if (parsed.role === 'ADMIN') {
+          fetchUsers();
+        }
       } catch (e) {
         console.error("Failed to parse user from local storage");
       }
@@ -167,6 +187,7 @@ export default function Settings() {
                         if (res.ok) {
                           toast.success(`Invitation sent successfully to ${email}!`);
                           form.reset();
+                          fetchUsers();
                         } else {
                           toast.error(`Error: ${data.message}`);
                         }
@@ -202,50 +223,93 @@ export default function Settings() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Reset User Password</CardTitle>
-                  <CardDescription>Generate a reset link for an existing user who forgot their password.</CardDescription>
+                  <CardTitle>Active Users</CardTitle>
+                  <CardDescription>Manage active members of your organization.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form 
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      const form = e.target as HTMLFormElement;
-                      const formData = new FormData(form);
-                      const email = formData.get('resetEmail') as string;
-                      
-                      try {
-                        const res = await fetch('/api/auth/generate-reset', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                          },
-                          body: JSON.stringify({ email })
-                        });
-                        
-                        const data = await res.json();
-                        if (res.ok) {
-                          toast.success(`Reset link sent successfully to ${email}!`);
-                          form.reset();
-                        } else {
-                          toast.error(`Error: ${data.message}`);
-                        }
-                      } catch (error) {
-                        toast.error('Failed to generate reset link');
-                      }
-                    }}
-                    className="space-y-4 max-w-md"
-                  >
-                    <div className="space-y-2">
-                      <Label htmlFor="resetEmail">Employee Email Address</Label>
-                      <Input id="resetEmail" name="resetEmail" type="email" required placeholder="john@transitops.in" />
-                    </div>
-                    <Button type="submit" variant="secondary" className="w-full">
-                      Send Reset Email
-                    </Button>
-                  </form>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {teamUsers.map((u: any) => (
+                        <TableRow key={u.id}>
+                          <TableCell className="font-medium">{u.name}</TableCell>
+                          <TableCell>{u.email}</TableCell>
+                          <TableCell>{u.role}</TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={async () => {
+                                if (confirm(`Are you sure you want to delete ${u.name}?`)) {
+                                  try {
+                                    const res = await fetch('/api/users', {
+                                      method: 'DELETE',
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                      },
+                                      body: JSON.stringify({ id: u.id })
+                                    });
+                                    if (res.ok) {
+                                      toast.success('User deleted');
+                                      fetchUsers();
+                                    } else {
+                                      const data = await res.json();
+                                      toast.error(data.message || 'Failed to delete user');
+                                    }
+                                  } catch(e) {
+                                    toast.error('Error deleting user');
+                                  }
+                                }
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
+
+              {invitations.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Pending Invitations</CardTitle>
+                    <CardDescription>Users who have been invited but haven't set up their accounts.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>Expires</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {invitations.map((inv: any) => (
+                          <TableRow key={inv.id}>
+                            <TableCell className="font-medium">{inv.name}</TableCell>
+                            <TableCell>{inv.email}</TableCell>
+                            <TableCell>{inv.role}</TableCell>
+                            <TableCell>{new Date(inv.expiresAt).toLocaleDateString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
           )}
         </Tabs>

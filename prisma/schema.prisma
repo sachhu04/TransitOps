@@ -25,11 +25,32 @@ model User {
   password       String?
   name           String
   role           Role      @default(FLEET_MANAGER)
-  inviteToken    String?   @unique
   resetToken     String?   @unique
   tokenExpiresAt DateTime?
+  isArchived     Boolean   @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      Role     @default(FLEET_MANAGER)
+  token     String   @unique
+  expiresAt DateTime
+  invitedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RateLimit {
+  id         String   @id @default(cuid())
+  identifier String
+  action     String
+  createdAt  DateTime @default(now())
+
+  @@index([identifier, action, createdAt])
 }
 
 enum VehicleStatus {
