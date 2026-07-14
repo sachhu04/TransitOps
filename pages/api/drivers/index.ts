@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       try {
         const { search, status, sort, order } = req.query;
-        let whereClause: any = {};
+        let whereClause: any = { isArchived: false };
         
         if (search) {
           whereClause.OR = [

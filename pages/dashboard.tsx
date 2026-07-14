@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { exportToPDF } from "@/utils/pdfExport";
 import useSWR from "swr";
 
@@ -65,6 +66,34 @@ export default function Dashboard() {
 
   const { data: dashboardData, error: dashError, isLoading: dashLoading } = useSWR(dashboardUrl, fetcher);
   const { data: tripsData, error: tripsError, isLoading: tripsLoading } = useSWR('/api/trips', fetcher);
+  const { data: auditData, isLoading: auditLoading } = useSWR('/api/audit', fetcher);
+  const { data: notesData, isLoading: notesLoading, mutate: mutateNotes } = useSWR('/api/notes', fetcher);
+
+  const [newNote, setNewNote] = useState("");
+  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
+
+  const handleAddNote = async () => {
+    if (!newNote.trim()) return;
+    setIsSubmittingNote(true);
+    try {
+      const res = await fetch('/api/notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ content: newNote })
+      });
+      if (res.ok) {
+        setNewNote("");
+        mutateNotes();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSubmittingNote(false);
+    }
+  };
 
   const recentTrips = Array.isArray(tripsData) ? tripsData.slice(0, 5) : [];
 
@@ -425,6 +454,87 @@ export default function Dashboard() {
                   </div>
                   {dashLoading ? <Skeleton className="h-7 w-12" /> : <span className="text-xl font-bold">{String(dashboardData?.maintenanceVehicles || 0).padStart(2, '0')}</span>}
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Audit Log & Shift Notes */}
+        <div className="grid gap-6 md:grid-cols-3">
+          <Card className="md:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="uppercase tracking-wider">Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                {auditLoading ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <div key={i} className="flex gap-4 items-start">
+                      <Skeleton className="w-2 h-2 mt-2 rounded-full" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                    </div>
+                  ))
+                ) : auditData && auditData.length > 0 ? (
+                  auditData.map((log: any) => (
+                    <div key={log.id} className="flex gap-4 items-start pb-4 border-b border-border last:border-0">
+                      <div className="w-2 h-2 mt-2 rounded-full bg-primary shrink-0" />
+                      <div>
+                        <p className="text-sm">
+                          <span className="font-semibold">{log.userName}</span> {log.action.replace(/_/g, ' ')}: {log.details}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(log.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">No recent activity.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="flex flex-col">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-wider">Shift Notes</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col flex-1 h-[400px]">
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+                {notesLoading ? (
+                  Array(3).fill(0).map((_, i) => (
+                    <div key={i} className="space-y-2 p-3 bg-muted/30 rounded-lg">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  ))
+                ) : notesData && notesData.length > 0 ? (
+                  notesData.map((note: any) => (
+                    <div key={note.id} className="p-3 bg-muted/30 rounded-lg border border-border/50">
+                      <p className="text-sm whitespace-pre-wrap">{note.content}</p>
+                      <div className="flex justify-between items-center mt-2 text-xs text-muted-foreground">
+                        <span className="font-medium">{note.authorName}</span>
+                        <span>{new Date(note.createdAt).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">No notes for this shift.</p>
+                )}
+              </div>
+              <div className="mt-auto space-y-3">
+                <Textarea 
+                  placeholder="Leave a note for the next shift..." 
+                  className="resize-none h-20"
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                />
+                <Button className="w-full" onClick={handleAddNote} disabled={isSubmittingNote || !newNote.trim()}>
+                  {isSubmittingNote ? 'Saving...' : 'Add Note'}
+                </Button>
               </div>
             </CardContent>
           </Card>

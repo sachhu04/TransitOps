@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (['SAFETY_OFFICER', 'FLEET_MANAGER'].includes(user.role)) {
         fetchPromises.push(
           prisma.driver.findMany({
-            where: { licenseExpiry: { lte: thirtyDaysFromNow } },
+            where: { licenseExpiry: { lte: thirtyDaysFromNow }, isArchived: false },
             select: { id: true, name: true, licenseExpiry: true }
           }).then(res => { expiringDrivers = res; })
         );
@@ -49,25 +49,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const notifications = [];
 
       expiringDrivers.forEach(driver => {
-        const daysLeft = Math.ceil((new Date(driver.licenseExpiry).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
-        const isExpired = daysLeft < 0;
         notifications.push({
           id: `driver-${driver.id}`,
-          title: isExpired ? 'License Expired' : 'License Expiring Soon',
-          description: isExpired 
-            ? `${driver.name}'s license has expired!` 
-            : `${driver.name}'s license expires in ${daysLeft} days.`,
           type: 'warning',
-          date: new Date() // Just for sorting
+          title: 'License Expiring',
+          description: `${driver.name}'s license is expiring on ${new Date(driver.licenseExpiry).toLocaleDateString()}`,
+          date: new Date()
         });
       });
 
       maintenanceVehicles.forEach(vehicle => {
         notifications.push({
           id: `vehicle-${vehicle.id}`,
+          type: 'info',
           title: 'Vehicle in Maintenance',
           description: `Vehicle ${vehicle.registration} is currently in the shop.`,
-          type: 'info',
           date: new Date()
         });
       });

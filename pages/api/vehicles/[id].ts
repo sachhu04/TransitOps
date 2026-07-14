@@ -62,30 +62,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.error('Update vehicle error:', error);
         return res.status(500).json({ message: 'Internal server error' });
       }
-    } else if (req.method === 'DELETE') {
+    } else if (req.method === 'PATCH') {
       if (user.role !== 'FLEET_MANAGER') {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
       try {
-        // Prevent deleting if it has active trips (optional safety measure, but let's try to delete safely)
+        // Prevent archiving if it has active trips
         const activeTrips = await prisma.trip.findFirst({
           where: { vehicleId: id, status: { in: ['ASSIGNED', 'DISPATCHED'] } }
         });
         if (activeTrips) {
-          return res.status(400).json({ message: 'Cannot delete vehicle with active trips' });
+          return res.status(400).json({ message: 'Cannot archive vehicle with active trips' });
         }
         
-        // Due to referential integrity, delete related first or use CASCADE.
-        // Assuming no cascade in schema, we'll manually delete trips, maintenance, and fuel logs.
-        await prisma.trip.deleteMany({ where: { vehicleId: id } });
-        await prisma.maintenanceLog.deleteMany({ where: { vehicleId: id } });
-        await prisma.fuelLog.deleteMany({ where: { vehicleId: id } });
+        await prisma.vehicle.update({ 
+          where: { id },
+          data: { isArchived: true }
+        });
         
-        await prisma.vehicle.delete({ where: { id } });
-        
-        return res.status(200).json({ message: 'Vehicle deleted successfully' });
+        return res.status(200).json({ message: 'Vehicle archived successfully' });
       } catch (error) {
-        console.error('Delete vehicle error:', error);
+        console.error('Archive vehicle error:', error);
         return res.status(500).json({ message: 'Internal server error' });
       }
     } else {

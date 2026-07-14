@@ -175,20 +175,20 @@ export default function Fleet() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleArchive = async () => {
     if (!selectedVehicle) return;
     try {
       const res = await fetch(`/api/vehicles/${selectedVehicle.id}`, {
-        method: "DELETE",
+        method: "PATCH",
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Failed to delete vehicle");
+        throw new Error(data.message || "Failed to archive vehicle");
       }
 
-      toast.success("Vehicle deleted successfully");
+      toast.success("Vehicle archived successfully");
       setIsDeleteDialogOpen(false);
       mutateVehicles();
       mutate('/api/dashboard');
@@ -310,7 +310,7 @@ export default function Fleet() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleOpenDeleteDialog(vehicle)} className="text-destructive focus:text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete Vehicle
+                  <Trash2 className="mr-2 h-4 w-4" /> Archive Vehicle
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -652,14 +652,13 @@ export default function Fleet() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Archive Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Archive Vehicle?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the vehicle {selectedVehicle?.registration} from the database.
-              This action cannot be undone.
+              This will archive the vehicle {selectedVehicle?.registration}. It will no longer appear in active lists.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -667,11 +666,11 @@ export default function Fleet() {
             <AlertDialogAction 
               onClick={(e) => {
                 e.preventDefault();
-                handleDelete();
+                handleArchive();
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              Archive
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

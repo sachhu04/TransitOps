@@ -145,18 +145,18 @@ export default function Drivers() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleArchive = async () => {
     if (!selectedDriver) return;
     try {
       const res = await fetch(`/api/drivers/${selectedDriver.id}`, {
-        method: 'DELETE',
+        method: 'PATCH',
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to delete driver');
+      if (!res.ok) throw new Error(data.message || 'Failed to archive driver');
       
-      toast.success('Driver deleted');
+      toast.success('Driver archived');
       mutate();
       setIsDeleteOpen(false);
     } catch (err: any) {
@@ -409,7 +409,7 @@ export default function Drivers() {
                         {canManage && (
                           <>
                             <DropdownMenuItem onClick={() => handleOpenEdit(driver)}>Edit Driver</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive" onClick={() => handleOpenDelete(driver)}>Delete Driver</DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive" onClick={() => handleOpenDelete(driver)}>Archive Driver</DropdownMenuItem>
                           </>
                         )}
                       </DropdownMenuContent>
@@ -576,15 +576,15 @@ export default function Drivers() {
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Archive Driver?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the driver {selectedDriver?.name}. This action cannot be undone.
+              This will archive the driver {selectedDriver?.name}. It will no longer appear in active lists.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogAction onClick={handleArchive} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Archive
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

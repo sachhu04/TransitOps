@@ -64,6 +64,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           prisma.driver.update({
             where: { id: data.driverId },
             data: { status: 'ON_TRIP' }
+          }),
+          prisma.activityLog.create({
+            data: {
+              userId: user.id,
+              userName: user.email.split('@')[0],
+              action: 'CREATED_TRIP',
+              entity: 'Trip',
+              details: `Trip from ${data.source} to ${data.destination}`
+            }
           })
         ]);
         return res.status(201).json(newTrip);

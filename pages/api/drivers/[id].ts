@@ -74,7 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } catch (error) {
         return res.status(500).json({ message: 'Failed to update driver.' });
       }
-    } else if (req.method === 'DELETE') {
+    } else if (req.method === 'PATCH') {
       if (!['FLEET_MANAGER', 'SAFETY_OFFICER'].includes(user.role)) {
         return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
       }
@@ -93,8 +93,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(400).json({ message: 'Driver is currently assigned to an active trip.' });
         }
 
-        await prisma.driver.delete({ where: { id } });
-        return res.status(200).json({ message: 'Driver deleted successfully.' });
+        await prisma.driver.update({ 
+          where: { id },
+          data: { isArchived: true }
+        });
+        
+        return res.status(200).json({ message: 'Driver archived successfully.' });
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }

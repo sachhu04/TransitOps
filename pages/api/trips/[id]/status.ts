@@ -26,7 +26,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await prisma.$transaction([
           prisma.trip.update({ where: { id: tripId }, data: { status: 'DISPATCHED', actualDeparture: new Date() } }),
           prisma.vehicle.update({ where: { id: trip.vehicleId }, data: { status: 'ON_TRIP' } }),
-          prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'ON_TRIP' } })
+          prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'ON_TRIP' } }),
+          prisma.activityLog.create({
+            data: {
+              userId: user.id,
+              userName: user.email.split('@')[0],
+              action: 'DISPATCHED_TRIP',
+              entity: 'Trip',
+              details: `Dispatched trip ${tripId}`
+            }
+          })
         ]);
         return res.status(200).json({ message: 'Trip dispatched successfully' });
       }
@@ -36,7 +45,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await prisma.$transaction([
           prisma.trip.update({ where: { id: tripId }, data: { status: 'COMPLETED', actualArrival: new Date() } }),
           prisma.vehicle.update({ where: { id: trip.vehicleId }, data: { status: 'AVAILABLE', mileage: { increment: trip.distance } } }),
-          prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'AVAILABLE', tripsCompleted: { increment: 1 } } })
+          prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'AVAILABLE', tripsCompleted: { increment: 1 } } }),
+          prisma.activityLog.create({
+            data: {
+              userId: user.id,
+              userName: user.email.split('@')[0],
+              action: 'COMPLETED_TRIP',
+              entity: 'Trip',
+              details: `Completed trip ${tripId}`
+            }
+          })
         ]);
         return res.status(200).json({ message: 'Trip completed successfully' });
       }
@@ -48,6 +66,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           tx.push(prisma.vehicle.update({ where: { id: trip.vehicleId }, data: { status: 'AVAILABLE' } }));
           tx.push(prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'AVAILABLE' } }));
         }
+        tx.push(prisma.activityLog.create({
+          data: {
+            userId: user.id,
+            userName: user.email.split('@')[0],
+            action: 'CANCELLED_TRIP',
+            entity: 'Trip',
+            details: `Cancelled trip ${tripId}`
+          }
+        }));
         await prisma.$transaction(tx);
         return res.status(200).json({ message: 'Trip cancelled successfully' });
       }

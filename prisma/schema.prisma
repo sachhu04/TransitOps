@@ -49,6 +49,7 @@ model Vehicle {
   region          String           @default("Maharashtra")
   lastService     DateTime?
   healthScore     Float
+  isArchived      Boolean          @default(false)
   trips           Trip[]
   maintenance     MaintenanceLog[]
   fuelLogs        FuelLog[]
@@ -58,6 +59,7 @@ model Vehicle {
 
   @@index([status])
   @@index([region])
+  @@index([isArchived])
 }
 
 enum DriverStatus {
@@ -78,11 +80,13 @@ model Driver {
   status          DriverStatus @default(AVAILABLE)
   avatar          String?
   contactNumber   String?
+  isArchived      Boolean      @default(false)
   trips           Trip[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
   @@index([status])
+  @@index([isArchived])
 }
 
 enum TripStatus {
@@ -182,4 +186,25 @@ model Expense {
 
   @@index([vehicleId])
   @@index([tripId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  userName  String
+  action    String
+  entity    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model ShiftNote {
+  id         String   @id @default(cuid())
+  content    String
+  authorName String
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
 }

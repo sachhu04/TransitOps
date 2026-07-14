@@ -10,6 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       try {
         const vehicles = await prisma.vehicle.findMany({
+          where: { isArchived: false },
           orderBy: { createdAt: 'desc' }
         });
         return res.status(200).json(vehicles);
