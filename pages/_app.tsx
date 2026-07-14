@@ -10,8 +10,13 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-sans"
 import { ThemeProvider } from "next-themes";
 
 export default function App({ Component, pageProps, router }: AppProps) {
-  // Do not use the layout for the login page
-  const isLoginPage = router.pathname === "/login";
+  // Do not use the layout for authentication pages
+  const isAuthPage = [
+    '/login',
+    '/forgot-password',
+    '/reset-password',
+    '/setup-account'
+  ].includes(router.pathname);
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
@@ -25,7 +30,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
       `}</style>
       <div className={`${spaceGrotesk.variable} ${spaceGrotesk.className} min-h-screen font-sans antialiased text-foreground`}>
         <TooltipProvider>
-          {isLoginPage ? (
+          {isAuthPage ? (
             <Component {...pageProps} />
           ) : (
             <Layout>

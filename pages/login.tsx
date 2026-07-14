@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -238,13 +239,12 @@ export default function Login() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password">Password</Label>
-                      <button 
-                        type="button" 
-                        onClick={() => alert("Please contact your IT Administrator. They can generate a secure password reset link for you from the Team Management dashboard.")}
+                      <Link 
+                        href="/forgot-password"
                         className="text-sm font-medium text-primary hover:underline"
                       >
                         Forgot password?
-                      </button>
+                      </Link>
                     </div>
                     <div className="relative">
                       <Input 
