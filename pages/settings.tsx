@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { Save, Check, Minus, Copy } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -12,8 +13,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Settings() {
   const [user, setUser] = useState<{name: string; role: string} | null>(null);
-  const [inviteLink, setInviteLink] = useState<string | null>(null);
-  const [resetLink, setResetLink] = useState<string | null>(null);
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -165,13 +165,13 @@ export default function Settings() {
                         
                         const data = await res.json();
                         if (res.ok) {
-                          setInviteLink(data.inviteLink);
+                          toast.success(`Invitation sent successfully to ${email}!`);
                           form.reset();
                         } else {
-                          alert(`Error: ${data.message}`);
+                          toast.error(`Error: ${data.message}`);
                         }
                       } catch (error) {
-                        alert('Failed to invite user');
+                        toast.error('Failed to invite user');
                       }
                     }}
                     className="space-y-4 max-w-md"
@@ -194,22 +194,9 @@ export default function Settings() {
                       </select>
                     </div>
                     <Button type="submit" className="w-full">
-                      Generate Invite Link
+                      Send Email Invitation
                     </Button>
                   </form>
-                  
-                  {inviteLink && (
-                    <div className="mt-6 p-4 border border-primary/20 bg-primary/5 rounded-lg space-y-2">
-                      <Label className="text-primary font-semibold">User invited successfully!</Label>
-                      <p className="text-sm text-muted-foreground">Copy the magic link below and send it to the employee so they can set up their account and password.</p>
-                      <div className="flex gap-2">
-                        <Input readOnly value={inviteLink} className="bg-background font-mono text-xs" />
-                        <Button variant="outline" size="icon" onClick={() => navigator.clipboard.writeText(inviteLink)}>
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
 
@@ -238,13 +225,13 @@ export default function Settings() {
                         
                         const data = await res.json();
                         if (res.ok) {
-                          setResetLink(data.resetLink);
+                          toast.success(`Reset link sent successfully to ${email}!`);
                           form.reset();
                         } else {
-                          alert(`Error: ${data.message}`);
+                          toast.error(`Error: ${data.message}`);
                         }
                       } catch (error) {
-                        alert('Failed to generate reset link');
+                        toast.error('Failed to generate reset link');
                       }
                     }}
                     className="space-y-4 max-w-md"
@@ -254,22 +241,9 @@ export default function Settings() {
                       <Input id="resetEmail" name="resetEmail" type="email" required placeholder="john@transitops.in" />
                     </div>
                     <Button type="submit" variant="secondary" className="w-full">
-                      Generate Reset Link
+                      Send Reset Email
                     </Button>
                   </form>
-                  
-                  {resetLink && (
-                    <div className="mt-6 p-4 border border-primary/20 bg-primary/5 rounded-lg space-y-2">
-                      <Label className="text-primary font-semibold">Reset Link Generated</Label>
-                      <p className="text-sm text-muted-foreground">Copy the link below and send it to the employee.</p>
-                      <div className="flex gap-2">
-                        <Input readOnly value={resetLink} className="bg-background font-mono text-xs" />
-                        <Button variant="outline" size="icon" onClick={() => navigator.clipboard.writeText(resetLink)}>
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </TabsContent>

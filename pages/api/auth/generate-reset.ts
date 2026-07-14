@@ -3,6 +3,9 @@ import { prisma } from '../../../lib/prisma';
 import { requireAuth } from '../../../lib/auth';
 import { z } from 'zod';
 import crypto from 'crypto';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const generateResetSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -46,9 +49,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${req.headers.host}`;
       const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
 
+      // Send email using Resend
+      const { data, error } = await resend.emails.send({
+        from: 'TransitOps <support@resend.dev>',
+        to: [email],
+        subject: 'TransitOps Password Reset',
+        html: `
+          <h1>Password Reset Request</h1>
+          <p>We received a request to reset your password for TransitOps.</p>
+          <p>Please click the link below to set a new password:</p>
+          <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Reset Password</a>
+          <p>Or copy this link into your browser: <br/> ${resetLink}</p>
+          <p>If you did not request this, please ignore this email.</p>
+        `,
+      });
+
+      if (error) {
+        console.error('Resend error:', error);
+        return res.status(500).json({ message: 'Failed to send reset email' });
+      }
+
       return res.status(200).json({
-        message: 'Reset link generated successfully',
-        resetLink,
+        message: 'Reset link generated and emailed successfully',
       });
     } catch (error) {
       console.error('Reset generation error:', error);
