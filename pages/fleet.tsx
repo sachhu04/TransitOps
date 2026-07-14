@@ -66,6 +66,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
 export type Vehicle = {
@@ -99,7 +100,7 @@ export default function Fleet() {
     }
   }, []);
 
-  const { data: vehicles, mutate: mutateVehicles } = useSWR<Vehicle[]>('/api/vehicles', fetcher);
+  const { data: vehicles, mutate: mutateVehicles, isLoading } = useSWR<Vehicle[]>('/api/vehicles', fetcher);
 
   const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -440,7 +441,17 @@ export default function Fleet() {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {isLoading ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <TableRow key={`skeleton-${i}`}>
+                      {table.getVisibleFlatColumns().map((col) => (
+                        <TableCell key={col.id} className="whitespace-nowrap">
+                          <Skeleton className="h-5 w-full max-w-[100px]" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
@@ -457,7 +468,7 @@ export default function Fleet() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
-                      {vehicles ? "No results." : "Loading vehicles..."}
+                      No results.
                     </TableCell>
                   </TableRow>
                 )}

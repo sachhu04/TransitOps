@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -62,8 +63,8 @@ export default function Dashboard() {
   const queryString = queryParams.toString();
   const dashboardUrl = queryString ? `/api/dashboard?${queryString}` : '/api/dashboard';
 
-  const { data: dashboardData, error: dashError } = useSWR(dashboardUrl, fetcher);
-  const { data: tripsData, error: tripsError } = useSWR('/api/trips', fetcher);
+  const { data: dashboardData, error: dashError, isLoading: dashLoading } = useSWR(dashboardUrl, fetcher);
+  const { data: tripsData, error: tripsError, isLoading: tripsLoading } = useSWR('/api/trips', fetcher);
 
   const recentTrips = Array.isArray(tripsData) ? tripsData.slice(0, 5) : [];
 
@@ -197,7 +198,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {String(dashboardData?.activeVehicles || 0).padStart(2, '0')}
+                  {dashLoading ? <Skeleton className="h-8 w-16" /> : String(dashboardData?.activeVehicles || 0).padStart(2, '0')}
                 </div>
               </CardContent>
             </Card>
@@ -211,7 +212,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {String(dashboardData?.availableVehicles || 0).padStart(2, '0')}
+                  {dashLoading ? <Skeleton className="h-8 w-16" /> : String(dashboardData?.availableVehicles || 0).padStart(2, '0')}
                 </div>
               </CardContent>
             </Card>
@@ -225,7 +226,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {String(dashboardData?.maintenanceVehicles || 0).padStart(2, '0')}
+                  {dashLoading ? <Skeleton className="h-8 w-16" /> : String(dashboardData?.maintenanceVehicles || 0).padStart(2, '0')}
                 </div>
               </CardContent>
             </Card>
@@ -239,7 +240,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {String(dashboardData?.activeTrips || 0).padStart(2, '0')}
+                  {dashLoading ? <Skeleton className="h-8 w-16" /> : String(dashboardData?.activeTrips || 0).padStart(2, '0')}
                 </div>
               </CardContent>
             </Card>
@@ -253,7 +254,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {String(dashboardData?.pendingTrips || 0).padStart(2, '0')}
+                  {dashLoading ? <Skeleton className="h-8 w-16" /> : String(dashboardData?.pendingTrips || 0).padStart(2, '0')}
                 </div>
               </CardContent>
             </Card>
@@ -267,7 +268,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {String(dashboardData?.driversOnDuty || 0).padStart(2, '0')}
+                  {dashLoading ? <Skeleton className="h-8 w-16" /> : String(dashboardData?.driversOnDuty || 0).padStart(2, '0')}
                 </div>
               </CardContent>
             </Card>
@@ -281,7 +282,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {Math.round(dashboardData?.fleetUtilization || 0)}%
+                  {dashLoading ? <Skeleton className="h-8 w-16" /> : `${Math.round(dashboardData?.fleetUtilization || 0)}%`}
                 </div>
               </CardContent>
             </Card>
@@ -349,31 +350,47 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentTrips.map((trip: any) => (
-                      <tr key={trip.id} className="border-b border-border hover:bg-muted/30 transition-colors">
-                        <td className="px-4 py-3 font-medium">{trip.id}</td>
-                        <td className="px-4 py-3">{trip.vehicle?.registration || trip.vehicleId}</td>
-                        <td className="px-4 py-3">{trip.driver?.name || '—'}</td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            variant="secondary"
-                            className={
-                              trip.status === "COMPLETED" ? "bg-success/10 text-success" :
-                                trip.status === "DISPATCHED" ? "bg-info/10 text-info" :
-                                  trip.status === "ASSIGNED" ? "bg-warning/10 text-warning" :
-                                    "bg-muted text-muted-foreground"
-                            }
-                          >
-                            {trip.status}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3">
-                          {trip.status === "COMPLETED" ? "—" :
-                            trip.status === "DRAFT" ? "Awaiting vehicle" :
-                              trip.estimatedArrival ? new Date(trip.estimatedArrival).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : "—"}
-                        </td>
+                    {tripsLoading ? (
+                      Array(5).fill(0).map((_, i) => (
+                        <tr key={`skeleton-${i}`} className="border-b border-border">
+                          <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                          <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                          <td className="px-4 py-3"><Skeleton className="h-4 w-32" /></td>
+                          <td className="px-4 py-3"><Skeleton className="h-6 w-20 rounded-full" /></td>
+                          <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                        </tr>
+                      ))
+                    ) : recentTrips.length > 0 ? (
+                      recentTrips.map((trip: any) => (
+                        <tr key={trip.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                          <td className="px-4 py-3 font-medium">{trip.id}</td>
+                          <td className="px-4 py-3">{trip.vehicle?.registration || trip.vehicleId}</td>
+                          <td className="px-4 py-3">{trip.driver?.name || '—'}</td>
+                          <td className="px-4 py-3">
+                            <Badge
+                              variant="secondary"
+                              className={
+                                trip.status === "COMPLETED" ? "bg-success/10 text-success" :
+                                  trip.status === "DISPATCHED" ? "bg-info/10 text-info" :
+                                    trip.status === "ASSIGNED" ? "bg-warning/10 text-warning" :
+                                      "bg-muted text-muted-foreground"
+                              }
+                            >
+                              {trip.status}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3">
+                            {trip.status === "COMPLETED" ? "—" :
+                              trip.status === "DRAFT" ? "Awaiting vehicle" :
+                                trip.estimatedArrival ? new Date(trip.estimatedArrival).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : "—"}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No recent trips.</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -392,21 +409,21 @@ export default function Dashboard() {
                     <div className="w-3 h-3 rounded-full bg-success"></div>
                     <span className="text-sm font-medium">Available</span>
                   </div>
-                  <span className="text-xl font-bold">{String(dashboardData?.availableVehicles || 0).padStart(2, '0')}</span>
+                  {dashLoading ? <Skeleton className="h-7 w-12" /> : <span className="text-xl font-bold">{String(dashboardData?.availableVehicles || 0).padStart(2, '0')}</span>}
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-primary"></div>
                     <span className="text-sm font-medium">On Trip</span>
                   </div>
-                  <span className="text-xl font-bold">{String(dashboardData?.activeVehicles || 0).padStart(2, '0')}</span>
+                  {dashLoading ? <Skeleton className="h-7 w-12" /> : <span className="text-xl font-bold">{String(dashboardData?.activeVehicles || 0).padStart(2, '0')}</span>}
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-destructive"></div>
                     <span className="text-sm font-medium">In Shop</span>
                   </div>
-                  <span className="text-xl font-bold">{String(dashboardData?.maintenanceVehicles || 0).padStart(2, '0')}</span>
+                  {dashLoading ? <Skeleton className="h-7 w-12" /> : <span className="text-xl font-bold">{String(dashboardData?.maintenanceVehicles || 0).padStart(2, '0')}</span>}
                 </div>
               </div>
             </CardContent>

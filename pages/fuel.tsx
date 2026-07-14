@@ -10,15 +10,17 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import useSWR, { mutate } from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const fetcher = (url: string) => fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(res => res.json());
 
 export default function FuelExpenses() {
-  const { data: fuelLogsData } = useSWR('/api/fuel', fetcher);
-  const { data: expensesData } = useSWR('/api/expenses', fetcher);
-  const { data: maintenanceData } = useSWR('/api/maintenance', fetcher);
+  const { data: fuelLogsData, isLoading: fuelLoading } = useSWR('/api/fuel', fetcher);
+  const { data: expensesData, isLoading: expensesLoading } = useSWR('/api/expenses', fetcher);
+  const { data: maintenanceData, isLoading: maintLoading } = useSWR('/api/maintenance', fetcher);
   const { data: vehiclesData } = useSWR('/api/vehicles', fetcher);
   const { data: tripsData } = useSWR('/api/trips', fetcher);
+  const isLoading = fuelLoading || expensesLoading || maintLoading;
 
   const fuelLogs = Array.isArray(fuelLogsData) ? fuelLogsData : [];
   const expenses = Array.isArray(expensesData) ? expensesData : [];
@@ -299,7 +301,16 @@ export default function FuelExpenses() {
                   </tr>
                 </thead>
                 <tbody>
-                  {fuelLogs.length > 0 ? fuelLogs.slice((fuelPage - 1) * ITEMS_PER_PAGE, fuelPage * ITEMS_PER_PAGE).map((log: { id: string, vehicle?: { registration: string }, vehicleId: string, date: string, liters: number, cost: number }) => (
+                  {fuelLoading ? (
+                    Array(5).fill(0).map((_, i) => (
+                      <tr key={`skel-fuel-${i}`} className="border-b border-border">
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-32" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
+                      </tr>
+                    ))
+                  ) : fuelLogs.length > 0 ? fuelLogs.slice((fuelPage - 1) * ITEMS_PER_PAGE, fuelPage * ITEMS_PER_PAGE).map((log: { id: string, vehicle?: { registration: string }, vehicleId: string, date: string, liters: number, cost: number }) => (
                     <tr key={log.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3 font-medium text-primary">{log.vehicle?.registration || log.vehicleId}</td>
                       <td className="px-4 py-3">{new Date(log.date).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric' })}</td>
@@ -360,7 +371,18 @@ export default function FuelExpenses() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tripExpenses.length > 0 ? tripExpenses.slice((expensePage - 1) * ITEMS_PER_PAGE, expensePage * ITEMS_PER_PAGE).map((exp: any, idx: number) => {
+                  {expensesLoading ? (
+                    Array(5).fill(0).map((_, i) => (
+                      <tr key={`skel-exp-${i}`} className="border-b border-border">
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                        <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
+                      </tr>
+                    ))
+                  ) : tripExpenses.length > 0 ? tripExpenses.slice((expensePage - 1) * ITEMS_PER_PAGE, expensePage * ITEMS_PER_PAGE).map((exp: any, idx: number) => {
                     const total = exp.toll + exp.other + exp.maint;
                     return (
                       <tr key={idx} className="border-b border-border hover:bg-muted/30 transition-colors">
@@ -415,8 +437,11 @@ export default function FuelExpenses() {
 
         <Card className="bg-primary/5 border-primary/20">
           <CardContent className="p-6">
-            <h2 className="text-xl font-bold tracking-tight text-center">
-              TOTAL OPERATIONAL COST (AUTO) = FUEL + MAINTENANCE <span className="text-primary ml-2">{totalOpCost.toLocaleString('en-IN')}</span>
+            <h2 className="text-xl font-bold tracking-tight text-center flex items-center justify-center flex-wrap gap-2">
+              TOTAL OPERATIONAL COST (AUTO) = FUEL + MAINTENANCE 
+              <span className="text-primary">
+                {isLoading ? <Skeleton className="h-7 w-32 inline-block align-middle" /> : totalOpCost.toLocaleString('en-IN')}
+              </span>
             </h2>
           </CardContent>
         </Card>

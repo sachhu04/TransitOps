@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const fetcher = (url: string) => fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(async res => {
   if (!res.ok) {
@@ -67,8 +68,8 @@ export default function Drivers() {
   const canManage = user?.role === 'FLEET_MANAGER' || user?.role === 'SAFETY_OFFICER';
   
   const queryUrl = `/api/drivers?search=${encodeURIComponent(search)}&status=${statusFilter}&sort=${sortBy}`;
-  const { data: drivers, mutate, error } = useSWR(queryUrl, fetcher);
-  const { data: dashboardData } = useSWR('/api/dashboard', fetcher);
+  const { data: drivers, mutate, error, isLoading } = useSWR(queryUrl, fetcher);
+  const { data: dashboardData, isLoading: dashLoading } = useSWR('/api/dashboard', fetcher);
   const displayDrivers = Array.isArray(drivers) ? drivers : [];
 
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -271,7 +272,7 @@ export default function Drivers() {
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Drivers</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashboardData?.totalDrivers || 0}</div>
+              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.totalDrivers || 0)}</div>
             </CardContent>
           </Card>
           <Card className="border-t-4 border-t-success">
@@ -279,7 +280,7 @@ export default function Drivers() {
               <CardTitle className="text-sm font-medium text-muted-foreground">Available</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-success">{dashboardData?.availableDrivers || 0}</div>
+              <div className="text-2xl font-bold text-success">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.availableDrivers || 0)}</div>
             </CardContent>
           </Card>
           <Card className="border-t-4 border-t-info">
@@ -287,7 +288,7 @@ export default function Drivers() {
               <CardTitle className="text-sm font-medium text-muted-foreground">On Trip</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-info">{dashboardData?.driversOnDuty || 0}</div>
+              <div className="text-2xl font-bold text-info">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.driversOnDuty || 0)}</div>
             </CardContent>
           </Card>
           <Card className="border-t-4 border-t-muted">
@@ -295,7 +296,7 @@ export default function Drivers() {
               <CardTitle className="text-sm font-medium text-muted-foreground">Off Duty</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-muted-foreground">{dashboardData?.offDutyDrivers || 0}</div>
+              <div className="text-2xl font-bold text-muted-foreground">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.offDutyDrivers || 0)}</div>
             </CardContent>
           </Card>
           <Card className="border-t-4 border-t-destructive">
@@ -303,7 +304,7 @@ export default function Drivers() {
               <CardTitle className="text-sm font-medium text-muted-foreground">Suspended</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">{dashboardData?.suspendedDrivers || 0}</div>
+              <div className="text-2xl font-bold text-destructive">{dashLoading ? <Skeleton className="h-8 w-12" /> : (dashboardData?.suspendedDrivers || 0)}</div>
             </CardContent>
           </Card>
         </div>
@@ -351,7 +352,35 @@ export default function Drivers() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayDrivers.map((driver: any) => {
+          {isLoading ? (
+            Array(6).fill(0).map((_, i) => (
+              <Card key={`skel-${i}`} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-5 w-32" />
+                          <Skeleton className="h-4 w-24" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      {Array(4).fill(0).map((_, j) => (
+                        <div key={`skel-metric-${j}`} className="space-y-1">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-5 w-12" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : displayDrivers.length === 0 ? (
+            <div className="col-span-full text-center text-muted-foreground py-8">No drivers found.</div>
+          ) : displayDrivers.map((driver: any) => {
             const expired = isLicenseExpired(driver.licenseExpiry);
             
             return (

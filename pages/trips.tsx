@@ -46,6 +46,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const tripSchema = z.object({
   source: z.string().min(1, "Source is required"),
@@ -90,9 +91,9 @@ export default function Trips() {
     }
   });
 
-  const { data: vehiclesData } = useSWR('/api/vehicles', fetcher);
-  const { data: driversData } = useSWR('/api/drivers', fetcher);
-  const { data: tripsData, mutate: mutateTrips } = useSWR('/api/trips', fetcher);
+  const { data: vehiclesData, isLoading: vehiclesLoading } = useSWR('/api/vehicles', fetcher);
+  const { data: driversData, isLoading: driversLoading } = useSWR('/api/drivers', fetcher);
+  const { data: tripsData, mutate: mutateTrips, isLoading: tripsLoading } = useSWR('/api/trips', fetcher);
 
   const vehicles = Array.isArray(vehiclesData) ? vehiclesData : [];
   const drivers = Array.isArray(driversData) ? driversData : [];
@@ -413,7 +414,15 @@ export default function Trips() {
                 </TabsList>
                 
                 <TabsContent value="active" className="flex-1 overflow-y-auto space-y-6 mt-0 pr-2">
-                  {activeTrips.length === 0 ? (
+                  {tripsLoading ? (
+                    Array(3).fill(0).map((_, i) => (
+                      <div key={`skel-active-${i}`} className="bg-card p-4 rounded-xl border border-border shadow-sm space-y-4">
+                        <Skeleton className="h-6 w-1/3" />
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-4 w-1/2" />
+                      </div>
+                    ))
+                  ) : activeTrips.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8">No active trips.</div>
                   ) : activeTrips.map((trip: any) => (
                     <div key={trip.id} className="bg-card p-4 rounded-xl border border-border shadow-sm relative overflow-hidden">
@@ -477,7 +486,15 @@ export default function Trips() {
                 </TabsContent>
                 
                 <TabsContent value="history" className="flex-1 overflow-y-auto space-y-6 mt-0 pr-2">
-                  {pastTrips.length === 0 ? (
+                  {tripsLoading ? (
+                    Array(3).fill(0).map((_, i) => (
+                      <div key={`skel-history-${i}`} className="bg-card p-4 rounded-xl border border-border shadow-sm space-y-4">
+                        <Skeleton className="h-6 w-1/3" />
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-4 w-1/2" />
+                      </div>
+                    ))
+                  ) : pastTrips.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8">No past trips found.</div>
                   ) : pastTrips.map((trip: any) => (
                     <div key={trip.id} className="bg-card p-4 rounded-xl border border-border shadow-sm relative overflow-hidden">

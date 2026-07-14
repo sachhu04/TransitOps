@@ -1,80 +1,94 @@
-# TransitOps Backend Integration
+# TransitOps Backend Architecture
 
-This document outlines the backend implementation for the TransitOps application, designed for the Odoo Hackathon.
+This document provides a comprehensive overview of the backend implementation for the TransitOps application, architected specifically to support enterprise-grade fleet management.
 
-## Tech Stack
-- **Database**: PostgreSQL (via Prisma ORM)
-- **Framework**: Next.js API Routes (Pages Router)
-- **Auth**: JWT + bcrypt
-- **Data Fetching**: SWR / React Query
+## Technology Stack
 
-## Setup Instructions
+- **Database System**: Supabase (Managed PostgreSQL)
+- **Object-Relational Mapping (ORM)**: Prisma Client
+- **API Framework**: Next.js API Routes (Serverless Functions)
+- **Authentication**: Stateless JSON Web Tokens (JWT) & bcrypt
+- **Connection Management**: Supabase PgBouncer (Transaction Pooling)
+- **Data Fetching**: SWR (Stale-While-Revalidate)
 
-1. **Database Setup**
-   Ensure you have a running PostgreSQL instance. Update the `DATABASE_URL` in the `.env` file at the root of the project to point to your database.
-   ```
-   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/transitops?schema=public"
-   JWT_SECRET="supersecret_jwt_key_transitops_hackathon_2026"
+## Environment Configuration
+
+Because TransitOps relies on a serverless architecture (Vercel), standard database connections can quickly exhaust connection limits. To solve this, the application leverages **Supabase Connection Pooling (PgBouncer)**.
+
+### Local Configuration
+
+1. **Setup Environment Variables**
+   Create a `.env` file in the root directory. You must configure two separate connection strings to correctly utilize Prisma with Supabase in a serverless context:
+
+   ```env
+   # Transaction Pooler (Used for application queries)
+   # Must include ?pgbouncer=true
+   DATABASE_URL="postgresql://postgres.[PROJECT-ID]:[PASSWORD]@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
+
+   # Direct Connection (Used only for Prisma migrations and schema pushes)
+   DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres"
+
+   # Security Token
+   JWT_SECRET="your_secure_jwt_secret"
    ```
 
 2. **Install Dependencies**
-   Run `npm install` to install all dependencies including the newly added backend packages (`@prisma/client`, `bcrypt`, `jsonwebtoken`, `swr`).
+   Run `npm install` to install required server-side dependencies (`@prisma/client`, `bcrypt`, `jsonwebtoken`, `swr`).
 
 3. **Prisma Configuration**
-   Run the following commands to initialize your database structure and push the schema:
+   Initialize the database schema against your Supabase instance:
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
 4. **Database Seeding**
-   To replace mock data with real database entries, run the seed script:
+   Populate the database with initial analytical metrics, vehicles, drivers, and trips:
    ```bash
-   npx prisma db seed
+   npm run seed
+   # or: npx prisma db seed
    ```
-   *Note: This will populate the database with default users (Admin, Driver, Safety Officer, Financial Analyst) and the mock data provided in `data/mock.ts` converted into PostgreSQL tables.*
 
-5. **Start Application**
+5. **Start Application Server**
    ```bash
    npm run dev
    ```
 
-## API Documentation
+## REST API Documentation
 
 ### Authentication (`/api/auth`)
-- `POST /api/auth/login`: Authenticates a user.
-  - Body: `{ email, password }`
+- `POST /api/auth/login`: Authenticates user credentials.
+  - Body: `{ email, password, role }`
   - Returns: `{ token, user: { id, name, email, role } }`
 
 ### Dashboard (`/api/dashboard`)
-- `GET /api/dashboard`: Aggregates KPIs (Active Vehicles, Active Trips, Utilization, Fuel Efficiency).
+- `GET /api/dashboard`: Aggregates and returns top-level Key Performance Indicators (Active Vehicles, Active Trips, Utilization, Fuel Efficiency).
 
 ### Vehicles (`/api/vehicles`)
-
-- `GET /api/vehicles`: Retrieves all vehicles.
-- `POST /api/vehicles`: Creates a new vehicle.
+- `GET /api/vehicles`: Retrieves comprehensive vehicle telematics and status records.
+- `POST /api/vehicles`: Provisions a new vehicle entity into the fleet.
 
 ### Drivers (`/api/drivers`)
-- `GET /api/drivers`: Retrieves all drivers.
-- `POST /api/drivers`: Creates a new driver.
+- `GET /api/drivers`: Retrieves all registered drivers and their respective safety/operational scores.
+- `POST /api/drivers`: Registers a new driver profile.
 
 ### Trips (`/api/trips`)
-- `GET /api/trips`: Retrieves all trips with related driver/vehicle data.
-- `POST /api/trips`: Creates a trip (enforces Hackathon business rules).
-- `PATCH /api/trips/[id]/status`: Updates trip status to `DISPATCHED`, `COMPLETED`, or `CANCELLED`, automatically adjusting vehicle and driver availability.
+- `GET /api/trips`: Retrieves all historical and active trips, joined with specific driver and vehicle relations.
+- `POST /api/trips`: Creates a trip (enforces strict logistical business rules regarding vehicle availability).
+- `PATCH /api/trips/[id]/status`: Mutates trip status (`DISPATCHED`, `COMPLETED`, `CANCELLED`), automatically triggering side-effects to adjust vehicle and driver availability states.
 
 ### Maintenance (`/api/maintenance`)
-- `GET /api/maintenance`: Retrieves maintenance logs.
-- `POST /api/maintenance`: Creates a maintenance log.
-- `PATCH /api/maintenance/[id]/status`: Updates log status, moving vehicle to `IN_SHOP` or `AVAILABLE`.
+- `GET /api/maintenance`: Retrieves maintenance and repair logs.
+- `POST /api/maintenance`: Submits a new maintenance work order.
+- `PATCH /api/maintenance/[id]/status`: Mutates log status, automatically adjusting corresponding vehicle states (`IN_SHOP` or `AVAILABLE`).
 
-### Fuel & Reports (`/api/fuel` & `/api/reports`)
-- `GET /api/fuel`: Retrieves all fuel logs.
-- `POST /api/fuel`: Creates a new fuel entry.
-- `GET /api/reports`: Computes vehicle-specific ROI, Fuel Efficiency, and Operational Costs based on Indian constraints (INR / KM).
+### Fuel & Analytics (`/api/fuel` & `/api/reports`)
+- `GET /api/fuel`: Retrieves all fleet fuel consumption logs.
+- `POST /api/fuel`: Logs a new fueling transaction.
+- `GET /api/reports`: Generates complex analytical views including vehicle-specific ROI, Fuel Efficiency, and Operational Costs based on predefined currency and metric constraints.
 
-## UI Integration Status
-- The frontend is now fully integrated with the Next.js API endpoints.
-- **Authentication**: The `Login` page securely connects to `/api/auth/login` and stores the JWT in `localStorage`.
-- **RBAC**: Role-Based Access Control is actively enforced across both UI navigation and API routes.
-- **All Modules Integrated**: `Dashboard`, `Analytics`, `Fleet`, `Drivers`, `Trips`, `Maintenance`, `Fuel`, and `Settings` have been successfully migrated to use live database API calls and SWR mutations, replacing the initial `mock.ts` setup.
+## Client-Server Integration Status
+
+- **Fully Integrated API**: All frontend dashboard modules directly interact with the Next.js Serverless API endpoints using SWR.
+- **Authentication**: The `Login` page securely connects to `/api/auth/login` and persists the JWT as an HTTP-only cookie or local storage, attaching it securely to subsequent API requests.
+- **Role-Based Access Control (RBAC)**: Strict RBAC is enforced both on the UI layer (conditional rendering) and the Server layer (API route validation).

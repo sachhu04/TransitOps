@@ -13,12 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const fetcher = (url: string) => fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(res => res.json());
 
 export default function Maintenance() {
-  const { data: vehiclesData } = useSWR('/api/vehicles', fetcher);
-  const { data: logsData, mutate: mutateLogs } = useSWR('/api/maintenance', fetcher);
+  const { data: vehiclesData, isLoading: vehiclesLoading } = useSWR('/api/vehicles', fetcher);
+  const { data: logsData, mutate: mutateLogs, isLoading: logsLoading } = useSWR('/api/maintenance', fetcher);
   const vehicles = Array.isArray(vehiclesData) ? vehiclesData : [];
   const logs = Array.isArray(logsData) ? logsData : [];
   
@@ -230,7 +231,21 @@ export default function Maintenance() {
             </CardHeader>
             <div className="overflow-y-auto flex-1 p-6">
               <div className="relative border-l-2 border-muted ml-3 space-y-8 pb-4">
-                {logs.length === 0 ? (
+                {logsLoading ? (
+                  Array(4).fill(0).map((_, i) => (
+                    <div key={`skel-${i}`} className="relative pl-6">
+                      <div className="absolute w-6 h-6 bg-card border-2 border-border rounded-full -left-[13px] top-0 flex items-center justify-center">
+                        <Skeleton className="w-3 h-3 rounded-full" />
+                      </div>
+                      <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
+                        <Skeleton className="h-6 w-1/3 mb-2" />
+                        <Skeleton className="h-4 w-1/4 mb-4" />
+                        <Separator className="my-2" />
+                        <Skeleton className="h-4 w-full" />
+                      </div>
+                    </div>
+                  ))
+                ) : logs.length === 0 ? (
                   <p className="text-muted-foreground pl-6">No maintenance records found.</p>
                 ) : (
                   logs.map((log: Record<string, any>) => (

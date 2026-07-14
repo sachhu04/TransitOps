@@ -23,12 +23,13 @@ import {
 import { exportToPDF } from "@/utils/pdfExport";
 import { Download, TrendingUp, Activity, DollarSign, Percent } from "lucide-react";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const fetcher = (url: string) => fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(res => res.json());
 
 export default function Analytics() {
-  const { data: reportsData } = useSWR('/api/reports', fetcher);
-  const { data: dashboard } = useSWR('/api/dashboard', fetcher);
+  const { data: reportsData, isLoading: reportsLoading } = useSWR('/api/reports', fetcher);
+  const { data: dashboard, isLoading: dashLoading } = useSWR('/api/dashboard', fetcher);
 
   const reports = Array.isArray(reportsData) ? reportsData : [];
   
@@ -126,7 +127,7 @@ export default function Analytics() {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashboard?.fuelEfficiency?.toFixed(1) || '0.0'} km/l</div>
+              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-24" /> : `${dashboard?.fuelEfficiency?.toFixed(1) || '0.0'} km/l`}</div>
             </CardContent>
           </Card>
           
@@ -136,7 +137,7 @@ export default function Analytics() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashboard?.fleetUtilization?.toFixed(0) || '0'}%</div>
+              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-16" /> : `${dashboard?.fleetUtilization?.toFixed(0) || '0'}%`}</div>
             </CardContent>
           </Card>
 
@@ -146,7 +147,7 @@ export default function Analytics() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹{(dashboard?.operationalCost || 0).toLocaleString()}</div>
+              <div className="text-2xl font-bold">{dashLoading ? <Skeleton className="h-8 w-24" /> : `₹${(dashboard?.operationalCost || 0).toLocaleString()}`}</div>
             </CardContent>
           </Card>
 
@@ -156,7 +157,7 @@ export default function Analytics() {
               <Percent className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{avgRoi.toFixed(1)}%</div>
+              <div className="text-2xl font-bold">{reportsLoading ? <Skeleton className="h-8 w-16" /> : `${avgRoi.toFixed(1)}%`}</div>
               <p className="text-[10px] text-muted-foreground mt-1">
                 ROI = (Revenue − (Maintenance + Fuel)) / Acquisition Cost
               </p>
@@ -192,7 +193,17 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topCostliestVehicles.length > 0 ? (
+                {reportsLoading ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <div key={`skel-cost-${i}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border">
+                      <div className="flex flex-col gap-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                      <Skeleton className="h-6 w-16 rounded-md" />
+                    </div>
+                  ))
+                ) : topCostliestVehicles.length > 0 ? (
                   topCostliestVehicles.map((vehicle: any) => (
                     <div key={vehicle.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border">
                       <div className="flex flex-col">

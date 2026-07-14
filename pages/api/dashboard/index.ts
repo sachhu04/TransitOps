@@ -21,28 +21,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         vehicleCounts,
         activeTrips,
         pendingTrips,
-        driversOnDuty,
         totalDistanceAgg,
         totalFuelAgg,
-        totalFuelCostAgg,
         totalMaintenanceCostAgg,
-        totalDrivers,
-        availableDrivers,
-        offDutyDrivers,
-        suspendedDrivers
+        driverCounts
       ] = await Promise.all([
         prisma.vehicle.groupBy({ by: ['status'], where: vehicleWhere, _count: { _all: true } }),
         prisma.trip.count({ where: { status: 'DISPATCHED', vehicle: vehicleWhere } }),
         prisma.trip.count({ where: { status: { in: ['DRAFT', 'ASSIGNED'] }, vehicle: vehicleWhere } }),
-        prisma.driver.count({ where: { status: 'ON_TRIP' } }),
         prisma.trip.aggregate({ _sum: { distance: true }, where: { status: 'COMPLETED', vehicle: vehicleWhere } }),
         prisma.fuelLog.aggregate({ _sum: { liters: true, cost: true }, where: { vehicle: vehicleWhere } }),
-        prisma.fuelLog.aggregate({ _sum: { cost: true }, where: { vehicle: vehicleWhere } }),
         prisma.maintenanceLog.aggregate({ _sum: { cost: true }, where: { vehicle: vehicleWhere } }),
-        prisma.driver.count(),
-        prisma.driver.count({ where: { status: 'AVAILABLE' } }),
-        prisma.driver.count({ where: { status: 'OFF_DUTY' } }),
-        prisma.driver.count({ where: { status: 'SUSPENDED' } })
+        prisma.driver.groupBy({ by: ['status'], _count: { _all: true } })
       ]);
 
       let totalVehicles = 0;
@@ -57,6 +47,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (vc.status === 'IN_SHOP') maintenanceVehicles = vc._count._all;
       }
 
+      let totalDrivers = 0;
+      let availableDrivers = 0;
+      let offDutyDrivers = 0;
+      let suspendedDrivers = 0;
+      let driversOnDuty = 0;
+
+      for (const dc of driverCounts) {
+        totalDrivers += dc._count._all;
+        if (dc.status === 'AVAILABLE') availableDrivers = dc._count._all;
+        if (dc.status === 'OFF_DUTY') offDutyDrivers = dc._count._all;
+        if (dc.status === 'SUSPENDED') suspendedDrivers = dc._count._all;
+        if (dc.status === 'ON_TRIP') driversOnDuty = dc._count._all;
+      }
+
       const totalDistance = totalDistanceAgg._sum.distance || 0;
       const totalFuel = totalFuelAgg._sum.liters || 0;
       
@@ -69,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         driversOnDuty,
         fleetUtilization: totalVehicles > 0 ? (activeVehicles / totalVehicles) * 100 : 0,
         fuelEfficiency: totalFuel > 0 ? totalDistance / totalFuel : 0,
-        operationalCost: (totalFuelCostAgg._sum.cost || 0) + (totalMaintenanceCostAgg._sum.cost || 0),
+        operationalCost: (totalFuelAgg._sum.cost || 0) + (totalMaintenanceCostAgg._sum.cost || 0),
         totalDrivers,
         availableDrivers,
         offDutyDrivers,
