@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
+import { sendEmail } from '../../../lib/email';
 
 const setupSchema = z.object({
   token: z.string().min(1, 'Token is required'),
@@ -40,6 +41,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         inviteToken: null,
         tokenExpiresAt: null,
       },
+    });
+
+    // Send confirmation email
+    await sendEmail({
+      to: user.email,
+      subject: 'TransitOps Account Activated',
+      html: `
+        <h1>Account Activated Successfully</h1>
+        <p>Hi ${user.name},</p>
+        <p>Your password has been successfully created and your TransitOps account is now active.</p>
+        <p>If you did not perform this action, please contact your administrator immediately.</p>
+      `,
     });
 
     return res.status(200).json({ message: 'Account setup successfully. You can now log in.' });

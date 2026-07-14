@@ -3,9 +3,7 @@ import { prisma } from '../../../lib/prisma';
 import { requireAuth } from '../../../lib/auth';
 import { z } from 'zod';
 import crypto from 'crypto';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { sendEmail } from '../../../lib/email';
 
 const createUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -53,22 +51,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${req.headers.host}`;
       const inviteLink = `${baseUrl}/setup-account?token=${inviteToken}`;
 
-      // Send email using Resend
-      const { data, error } = await resend.emails.send({
-        from: 'TransitOps <onboarding@resend.dev>',
-        to: [email],
-        subject: 'You have been invited to TransitOps',
+      // Send email
+      const { success, error } = await sendEmail({
+        to: email,
+        subject: 'Welcome to TransitOps - Account Invitation',
         html: `
-          <h1>Welcome to TransitOps!</h1>
-          <p>You have been invited by the Admin to join as a <strong>${role}</strong>.</p>
-          <p>Please click the link below to set up your account and password:</p>
-          <a href="${inviteLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Set up your account</a>
+          <h1>Welcome to TransitOps</h1>
+          <p>Hi ${name},</p>
+          <p>You have been invited to join TransitOps as a <strong>${role}</strong>.</p>
+          <p>Please click the link below to set up your password and access your account:</p>
+          <a href="${inviteLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Set Up Account</a>
           <p>Or copy this link into your browser: <br/> ${inviteLink}</p>
         `,
       });
 
-      if (error) {
-        console.error('Resend error:', error);
+      if (!success) {
+        console.error('Nodemailer error:', error);
         return res.status(500).json({ message: 'Failed to send invitation email' });
       }
 

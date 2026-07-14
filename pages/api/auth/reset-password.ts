@@ -2,6 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const resetSchema = z.object({
   token: z.string().min(1, 'Token is required'),
@@ -40,6 +43,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         resetToken: null,
         tokenExpiresAt: null,
       },
+    });
+
+    // Send confirmation email
+    await resend.emails.send({
+      from: 'TransitOps <notifications@resend.dev>',
+      to: [user.email],
+      subject: 'TransitOps Password Reset Successfully',
+      html: `
+        <h1>Password Reset Complete</h1>
+        <p>Hi ${user.name},</p>
+        <p>Your password has been successfully reset.</p>
+        <p>If you did not perform this action, please contact your administrator immediately.</p>
+      `,
     });
 
     return res.status(200).json({ message: 'Password reset successfully. You can now log in.' });
