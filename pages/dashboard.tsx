@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Route, Wrench, Activity, Percent, Filter, Download, Plus } from 'lucide-react';
+import {
+  Route,
+  Wrench,
+  Activity,
+  Percent,
+  Filter,
+  Download,
+  Plus,
+  FileText,
+  FileSpreadsheet,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -679,15 +689,49 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="reports" className="outline-none">
-            <Card className="h-[400px] flex items-center justify-center border-dashed">
-              <div className="text-center">
-                <Download className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-50" />
-                <h3 className="text-lg font-medium">Custom Reports</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Report generation suite coming soon.
-                </p>
-              </div>
-            </Card>
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card className="border-border/50 shadow-sm hover:border-border transition-all">
+                <CardHeader>
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
+                    <FileSpreadsheet className="w-5 h-5 text-primary" />
+                  </div>
+                  <CardTitle>Export as CSV</CardTitle>
+                  <CardDescription>
+                    Download a raw spreadsheet of all your active fleet metrics, trips, and vehicle
+                    statuses.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={exportCSV} variant="outline" className="w-full">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download CSV
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50 shadow-sm hover:border-border transition-all">
+                <CardHeader>
+                  <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center mb-2">
+                    <FileText className="w-5 h-5 text-destructive" />
+                  </div>
+                  <CardTitle>Export as PDF</CardTitle>
+                  <CardDescription>
+                    Generate a formatted, print-ready executive summary report of your fleet
+                    operations.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    onClick={exportPDF}
+                    variant="outline"
+                    className="w-full border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Generate PDF
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
