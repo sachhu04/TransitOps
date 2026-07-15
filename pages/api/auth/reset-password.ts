@@ -25,13 +25,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     const user = await prisma.user.findUnique({ where: { resetToken: hashedToken } });
-    
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired reset token' });
     }
 
     if (user.tokenExpiresAt && user.tokenExpiresAt < new Date()) {
-      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
+      return res
+        .status(400)
+        .json({ message: 'Reset token has expired. Please request a new one.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

@@ -11,19 +11,26 @@ export interface DecodedToken {
   exp: number;
 }
 
-export function generateToken(payload: { id: string; email: string; role: string }, expiresIn: string | number = '1d') {
+export function generateToken(
+  payload: { id: string; email: string; role: string },
+  expiresIn: string | number = '1d'
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return jwt.sign(payload, JWT_SECRET, { expiresIn: expiresIn as any });
 }
 
 export function verifyToken(token: string): DecodedToken | null {
   try {
     return jwt.verify(token, JWT_SECRET) as DecodedToken;
+    // eslint-disable-next-line unused-imports/no-unused-vars
   } catch (error) {
     return null;
   }
 }
 
-export function requireAuth(handler: (req: NextApiRequest, res: NextApiResponse, user: DecodedToken) => void | Promise<void>) {
+export function requireAuth(
+  handler: (req: NextApiRequest, res: NextApiResponse, user: DecodedToken) => void | Promise<void>
+) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     let token = req.cookies.token;
 
@@ -48,7 +55,10 @@ export function requireAuth(handler: (req: NextApiRequest, res: NextApiResponse,
   };
 }
 
-export function requireRoles(roles: string[], handler: (req: NextApiRequest, res: NextApiResponse, user: DecodedToken) => void | Promise<void>) {
+export function requireRoles(
+  roles: string[],
+  handler: (req: NextApiRequest, res: NextApiResponse, user: DecodedToken) => void | Promise<void>
+) {
   return requireAuth(async (req, res, user) => {
     if (!roles.includes(user.role)) {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });

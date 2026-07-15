@@ -4,9 +4,9 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Starting cleanup of legacy pending users...');
-  
+
   const pendingUsers = await prisma.user.findMany({
-    where: { password: null }
+    where: { password: null },
   });
 
   console.log(`Found ${pendingUsers.length} legacy pending users without passwords.`);

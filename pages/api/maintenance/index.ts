@@ -8,9 +8,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const logs = await prisma.maintenanceLog.findMany({
           include: { vehicle: true },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: 'desc' },
         });
         return res.status(200).json(logs);
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }
@@ -25,7 +26,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const vehicle = await prisma.vehicle.findUnique({ where: { id: data.vehicleId } });
         if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
 
-        const tx: any[] = [];
+        // eslint-disable-next-line unused-imports/no-unused-vars
+        const tx: unknown[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let newLog: any;
 
         if (status === 'IN_PROGRESS') {
@@ -37,10 +40,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 date: new Date(data.date),
                 technician: data.technician,
                 cost: Number(data.cost),
-                status: status
-              }
+                status: status,
+              },
             }),
-            prisma.vehicle.update({ where: { id: data.vehicleId }, data: { status: 'IN_SHOP' } })
+            prisma.vehicle.update({ where: { id: data.vehicleId }, data: { status: 'IN_SHOP' } }),
           ]);
           newLog = createdLog;
         } else {
@@ -51,12 +54,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               date: new Date(data.date),
               technician: data.technician,
               cost: Number(data.cost),
-              status: status
-            }
+              status: status,
+            },
           });
         }
 
         return res.status(201).json(newLog);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error('Maintenance error:', error);
         return res.status(500).json({ message: error.message || 'Internal server error' });

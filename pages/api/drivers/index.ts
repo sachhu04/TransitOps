@@ -5,7 +5,9 @@ import { z } from 'zod';
 
 const createDriverSchema = z.object({
   name: z.string().min(1, 'Full Name is required'),
-  licenseNumber: z.string().regex(/^[A-Z]{2}[0-9]{2} ?[0-9]{11}$/i, 'Invalid Indian Driving License format'),
+  licenseNumber: z
+    .string()
+    .regex(/^[A-Z]{2}[0-9]{2} ?[0-9]{11}$/i, 'Invalid Indian Driving License format'),
   licenseCategory: z.string().min(1, 'License Category is required'),
   licenseExpiry: z.string().or(z.date()),
   contactNumber: z.string().regex(/^(?:\+91)?[6-9]\d{9}$/, 'Invalid Indian mobile number'),
@@ -21,19 +23,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       try {
         const { search, status, sort, order } = req.query;
-        let whereClause: any = { isArchived: false };
-        
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const whereClause: any = { isArchived: false };
+
         if (search) {
           whereClause.OR = [
             { name: { contains: String(search), mode: 'insensitive' } },
             { licenseNumber: { contains: String(search), mode: 'insensitive' } },
           ];
         }
-        
+
         if (status && status !== 'ALL') {
           whereClause.status = status;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let orderByClause: any = { createdAt: 'desc' };
         if (sort) {
           const sortOrder = order === 'asc' ? 'asc' : 'desc';
@@ -47,9 +51,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const drivers = await prisma.driver.findMany({
           where: whereClause,
-          orderBy: orderByClause
+          orderBy: orderByClause,
         });
         return res.status(200).json(drivers);
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }
@@ -65,7 +70,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const data = validation.data;
 
-        const existing = await prisma.driver.findUnique({ where: { licenseNumber: data.licenseNumber } });
+        const existing = await prisma.driver.findUnique({
+          where: { licenseNumber: data.licenseNumber },
+        });
         if (existing) {
           return res.status(400).json({ message: 'License number already exists.' });
         }
@@ -79,17 +86,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             experienceYears: 0,
             status: data.status,
             // storing contact and category in avatar field since we cannot modify schema
-            avatar: JSON.stringify({ contact: data.contactNumber, category: data.licenseCategory })
-          }
+            avatar: JSON.stringify({ contact: data.contactNumber, category: data.licenseCategory }),
+          },
         });
-        
+
         // parse it back before returning
         return res.status(201).json({
           ...newDriver,
           contactNumber: data.contactNumber,
           licenseCategory: data.licenseCategory,
-          avatar: null
+          avatar: null,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error('Driver creation error:', error);
         return res.status(500).json({ message: error.message || 'Failed to save driver.' });

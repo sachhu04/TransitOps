@@ -1,22 +1,28 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface ExportToPDFOptions {
   title: string;
   filename: string;
   headers: string[];
   data: (string | number)[][];
-  orientation?: "portrait" | "landscape";
+  orientation?: 'portrait' | 'landscape';
 }
 
-export const exportToPDF = ({ title, filename, headers, data, orientation = "portrait" }: ExportToPDFOptions) => {
+export const exportToPDF = ({
+  title,
+  filename,
+  headers,
+  data,
+  orientation = 'portrait',
+}: ExportToPDFOptions) => {
   const doc = new jsPDF({ orientation });
 
   // Add Company Logo / Brand Name
   doc.setFontSize(22);
   doc.setTextColor(229, 75, 75); // TransitOps primary color (#E54B4B)
-  doc.setFont("helvetica", "bold");
-  doc.text("TransitOps", 14, 20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('TransitOps', 14, 20);
 
   // Add Report Title
   doc.setFontSize(16);
@@ -26,12 +32,12 @@ export const exportToPDF = ({ title, filename, headers, data, orientation = "por
   // Add Generation Date
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139); // slate-500
-  doc.setFont("helvetica", "normal");
+  doc.setFont('helvetica', 'normal');
   const dateStr = new Date().toLocaleString();
   doc.text(`Generated on: ${dateStr}`, 14, 38);
 
-  const sanitizedData = data.map(row => 
-    row.map(cell => typeof cell === 'string' ? cell.replace(/₹/g, 'Rs. ') : cell)
+  const sanitizedData = data.map((row) =>
+    row.map((cell) => (typeof cell === 'string' ? cell.replace(/₹/g, 'Rs. ') : cell))
   );
 
   // Add Table
@@ -56,6 +62,7 @@ export const exportToPDF = ({ title, filename, headers, data, orientation = "por
     },
     didDrawPage: (dataArg) => {
       // Add Page Number at the bottom
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const str = `Page ${(doc.internal as any).getNumberOfPages()}`;
       doc.setFontSize(10);
       doc.setTextColor(100);

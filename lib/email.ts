@@ -11,7 +11,15 @@ export const emailTransporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = async ({ to, subject, html }: { to: string; subject: string; html: string }) => {
+export const sendEmail = async ({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) => {
   try {
     const info = await emailTransporter.sendMail({
       from: `"TransitOps Notifications" <${process.env.EMAIL_USER}>`,

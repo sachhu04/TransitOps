@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const driver = await prisma.driver.findUnique({ where: { id } });
         if (!driver) return res.status(404).json({ message: 'Driver not found' });
         return res.status(200).json(driver);
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }
@@ -46,8 +47,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const existing = await prisma.driver.findFirst({
           where: {
             licenseNumber: data.licenseNumber,
-            id: { not: id }
-          }
+            id: { not: id },
+          },
         });
         if (existing) {
           return res.status(400).json({ message: 'License number already exists.' });
@@ -61,16 +62,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             licenseExpiry: new Date(data.licenseExpiry),
             safetyScore: data.safetyScore,
             status: data.status,
-            avatar: JSON.stringify({ contact: data.contactNumber, category: data.licenseCategory })
-          }
+            avatar: JSON.stringify({ contact: data.contactNumber, category: data.licenseCategory }),
+          },
         });
 
         return res.status(200).json({
           ...updatedDriver,
           contactNumber: data.contactNumber,
           licenseCategory: data.licenseCategory,
-          avatar: null
+          avatar: null,
         });
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Failed to update driver.' });
       }
@@ -81,24 +83,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const driver = await prisma.driver.findUnique({
           where: { id },
-          include: { trips: true }
+          include: { trips: true },
         });
 
         if (!driver) {
           return res.status(404).json({ message: 'Driver not found.' });
         }
 
-        const hasActiveTrip = driver.trips.some(t => ['ASSIGNED', 'DISPATCHED'].includes(t.status));
+        const hasActiveTrip = driver.trips.some((t) =>
+          ['ASSIGNED', 'DISPATCHED'].includes(t.status)
+        );
         if (hasActiveTrip) {
-          return res.status(400).json({ message: 'Driver is currently assigned to an active trip.' });
+          return res
+            .status(400)
+            .json({ message: 'Driver is currently assigned to an active trip.' });
         }
 
-        await prisma.driver.update({ 
+        await prisma.driver.update({
           where: { id },
-          data: { isArchived: true }
+          data: { isArchived: true },
         });
-        
+
         return res.status(200).json({ message: 'Driver archived successfully.' });
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }

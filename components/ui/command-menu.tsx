@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react"
-import { useRouter } from "next/router"
-import { Calculator, Calendar, CreditCard, Settings, Smile, User, Car, Users, Route } from "lucide-react"
+import React, { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/router';
+import { Calendar, Settings, User, Car, Users, Route } from 'lucide-react';
 
 import {
   CommandDialog,
@@ -11,28 +11,28 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@/components/ui/command"
+} from '@/components/ui/command';
 
 export function CommandMenu() {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
+    };
 
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [])
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
 
   const runCommand = useCallback((command: () => unknown) => {
-    setOpen(false)
-    command()
-  }, [])
+    setOpen(false);
+    command();
+  }, []);
 
   return (
     <>
@@ -84,5 +84,5 @@ export function CommandMenu() {
         </CommandList>
       </CommandDialog>
     </>
-  )
+  );
 }

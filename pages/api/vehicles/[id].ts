@@ -18,6 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const vehicle = await prisma.vehicle.findUnique({ where: { id } });
         if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
         return res.status(200).json(vehicle);
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }
@@ -27,16 +28,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       try {
         const data = req.body;
-        
+
         // Optional registration format validation if updating registration
         if (data.registration) {
           const regRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/i;
           if (!regRegex.test(data.registration.replace(/\s+/g, ''))) {
             return res.status(400).json({ message: 'Invalid Indian registration number format' });
           }
-          
+
           // Check uniqueness if changing
-          const existing = await prisma.vehicle.findUnique({ where: { registration: data.registration } });
+          const existing = await prisma.vehicle.findUnique({
+            where: { registration: data.registration },
+          });
           if (existing && existing.id !== id) {
             return res.status(400).json({ message: 'Vehicle registration must be unique.' });
           }
@@ -53,9 +56,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             status: data.status,
             mileage: data.mileage !== undefined ? Number(data.mileage) : undefined,
             capacity: data.capacity !== undefined ? Number(data.capacity) : undefined,
-            acquisitionCost: data.acquisitionCost !== undefined ? Number(data.acquisitionCost) : undefined,
+            acquisitionCost:
+              data.acquisitionCost !== undefined ? Number(data.acquisitionCost) : undefined,
             region: data.region,
-          }
+          },
         });
         return res.status(200).json(updatedVehicle);
       } catch (error) {
@@ -69,17 +73,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         // Prevent archiving if it has active trips
         const activeTrips = await prisma.trip.findFirst({
-          where: { vehicleId: id, status: { in: ['ASSIGNED', 'DISPATCHED'] } }
+          where: { vehicleId: id, status: { in: ['ASSIGNED', 'DISPATCHED'] } },
         });
         if (activeTrips) {
           return res.status(400).json({ message: 'Cannot archive vehicle with active trips' });
         }
-        
-        await prisma.vehicle.update({ 
+
+        await prisma.vehicle.update({
           where: { id },
-          data: { isArchived: true }
+          data: { isArchived: true },
         });
-        
+
         return res.status(200).json({ message: 'Vehicle archived successfully' });
       } catch (error) {
         console.error('Archive vehicle error:', error);

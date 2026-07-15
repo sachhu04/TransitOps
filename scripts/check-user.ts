@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const email = 'sachin23bcs64@iiitkottayam.ac.in';
-  
+
   const user = await prisma.user.findUnique({ where: { email } });
   if (user) {
     console.log('Found in User table:', user);
@@ -20,4 +20,6 @@ async function main() {
   }
 }
 
-main().catch(console.error).finally(() => prisma.$disconnect());
+main()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());

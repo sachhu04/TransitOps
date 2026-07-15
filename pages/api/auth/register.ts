@@ -81,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       return res.status(201).json({
-        message: 'User invited successfully'
+        message: 'User invited successfully',
       });
     } catch (error) {
       console.error('Registration error:', error);

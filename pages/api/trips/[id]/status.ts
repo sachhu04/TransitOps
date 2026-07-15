@@ -16,15 +16,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { status } = req.body; // DISPATCHED, COMPLETED, CANCELLED
 
       const tripId = id as string;
-      const trip = await prisma.trip.findUnique({ where: { id: tripId }, include: { vehicle: true, driver: true } });
+      const trip = await prisma.trip.findUnique({
+        where: { id: tripId },
+        include: { vehicle: true, driver: true },
+      });
       if (!trip) return res.status(404).json({ message: 'Trip not found' });
 
       if (status === 'DISPATCHED') {
-        if (trip.vehicle.status !== 'AVAILABLE') return res.status(400).json({ message: 'Vehicle is not available' });
-        if (trip.driver.status !== 'AVAILABLE') return res.status(400).json({ message: 'Driver is not available' });
-        
+        if (trip.vehicle.status !== 'AVAILABLE')
+          return res.status(400).json({ message: 'Vehicle is not available' });
+        if (trip.driver.status !== 'AVAILABLE')
+          return res.status(400).json({ message: 'Driver is not available' });
+
         await prisma.$transaction([
-          prisma.trip.update({ where: { id: tripId }, data: { status: 'DISPATCHED', actualDeparture: new Date() } }),
+          prisma.trip.update({
+            where: { id: tripId },
+            data: { status: 'DISPATCHED', actualDeparture: new Date() },
+          }),
           prisma.vehicle.update({ where: { id: trip.vehicleId }, data: { status: 'ON_TRIP' } }),
           prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'ON_TRIP' } }),
           prisma.activityLog.create({
@@ -33,48 +41,67 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               userName: user.email.split('@')[0],
               action: 'DISPATCHED_TRIP',
               entity: 'Trip',
-              details: `Dispatched trip ${tripId}`
-            }
-          })
+              details: `Dispatched trip ${tripId}`,
+            },
+          }),
         ]);
         return res.status(200).json({ message: 'Trip dispatched successfully' });
       }
 
       if (status === 'COMPLETED') {
-        if (trip.status !== 'DISPATCHED') return res.status(400).json({ message: 'Only dispatched trips can be completed' });
+        if (trip.status !== 'DISPATCHED')
+          return res.status(400).json({ message: 'Only dispatched trips can be completed' });
         await prisma.$transaction([
-          prisma.trip.update({ where: { id: tripId }, data: { status: 'COMPLETED', actualArrival: new Date() } }),
-          prisma.vehicle.update({ where: { id: trip.vehicleId }, data: { status: 'AVAILABLE', mileage: { increment: trip.distance } } }),
-          prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'AVAILABLE', tripsCompleted: { increment: 1 } } }),
+          prisma.trip.update({
+            where: { id: tripId },
+            data: { status: 'COMPLETED', actualArrival: new Date() },
+          }),
+          prisma.vehicle.update({
+            where: { id: trip.vehicleId },
+            data: { status: 'AVAILABLE', mileage: { increment: trip.distance } },
+          }),
+          prisma.driver.update({
+            where: { id: trip.driverId },
+            data: { status: 'AVAILABLE', tripsCompleted: { increment: 1 } },
+          }),
           prisma.activityLog.create({
             data: {
               userId: user.id,
               userName: user.email.split('@')[0],
               action: 'COMPLETED_TRIP',
               entity: 'Trip',
-              details: `Completed trip ${tripId}`
-            }
-          })
+              details: `Completed trip ${tripId}`,
+            },
+          }),
         ]);
         return res.status(200).json({ message: 'Trip completed successfully' });
       }
 
       if (status === 'CANCELLED') {
         // If it was dispatched, restore statuses to AVAILABLE. If not, just cancel.
-        const tx: any[] = [ prisma.trip.update({ where: { id: tripId }, data: { status: 'CANCELLED' } }) ];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tx: any[] = [
+          prisma.trip.update({ where: { id: tripId }, data: { status: 'CANCELLED' } }),
+        ];
         if (trip.status === 'DISPATCHED') {
-          tx.push(prisma.vehicle.update({ where: { id: trip.vehicleId }, data: { status: 'AVAILABLE' } }));
-          tx.push(prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'AVAILABLE' } }));
+          tx.push(
+            prisma.vehicle.update({ where: { id: trip.vehicleId }, data: { status: 'AVAILABLE' } })
+          );
+          tx.push(
+            prisma.driver.update({ where: { id: trip.driverId }, data: { status: 'AVAILABLE' } })
+          );
         }
-        tx.push(prisma.activityLog.create({
-          data: {
-            userId: user.id,
-            userName: user.email.split('@')[0],
-            action: 'CANCELLED_TRIP',
-            entity: 'Trip',
-            details: `Cancelled trip ${tripId}`
-          }
-        }));
+        tx.push(
+          prisma.activityLog.create({
+            data: {
+              userId: user.id,
+              userName: user.email.split('@')[0],
+              action: 'CANCELLED_TRIP',
+              entity: 'Trip',
+              details: `Cancelled trip ${tripId}`,
+            },
+          })
+        );
         await prisma.$transaction(tx);
         return res.status(200).json({ message: 'Trip cancelled successfully' });
       }

@@ -30,7 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (!user.password) {
-      return res.status(401).json({ message: 'Account not set up. Please use your invite link to create a password.' });
+      return res
+        .status(401)
+        .json({ message: 'Account not set up. Please use your invite link to create a password.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -41,11 +43,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const expiresIn = rememberMe ? '30d' : '1d';
     const maxAge = rememberMe ? 2592000 : 86400; // 30 days or 1 day in seconds
 
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    }, expiresIn);
+    const token = generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      expiresIn
+    );
 
     res.setHeader(
       'Set-Cookie',
@@ -59,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         name: user.name,
         email: user.email,
         role: user.role,
-      }
+      },
     });
   } catch (error) {
     console.error('Login error:', error);

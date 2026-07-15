@@ -25,13 +25,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     const invitation = await prisma.invitation.findUnique({ where: { token: hashedToken } });
-    
+
     if (!invitation) {
       return res.status(400).json({ message: 'Invalid or expired invite token' });
     }
 
     if (invitation.expiresAt < new Date()) {
-      return res.status(400).json({ message: 'Invite token has expired. Please contact your administrator.' });
+      return res
+        .status(400)
+        .json({ message: 'Invite token has expired. Please contact your administrator.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

@@ -1,24 +1,33 @@
-import React, { useState, useMemo } from "react";
-import Head from "next/head";
-import { 
-  useReactTable, 
-  getCoreRowModel, 
-  getPaginationRowModel, 
-  getSortedRowModel, 
+import React, { useState, useMemo } from 'react';
+import Head from 'next/head';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   getFilteredRowModel,
   flexRender,
   ColumnDef,
-  SortingState
-} from "@tanstack/react-table";
-import { Plus, Search, SlidersHorizontal, ChevronDown, MoreHorizontal, Pencil, Trash2, Download } from "lucide-react";
-import useSWR, { mutate } from "swr";
-import { exportToPDF } from "@/utils/pdfExport";
+  SortingState,
+} from '@tanstack/react-table';
+import {
+  Plus,
+  Search,
+  SlidersHorizontal,
+  ChevronDown,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Download,
+} from 'lucide-react';
+import useSWR, { mutate } from 'swr';
+import { exportToPDF } from '@/utils/pdfExport';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -31,16 +40,16 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
   DropdownMenuPortal,
-} from "@/components/ui/dropdown-menu";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
+} from '@/components/ui/dropdown-menu';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -48,7 +57,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,16 +67,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
 
 export type Vehicle = {
   id: string;
@@ -76,7 +85,7 @@ export type Vehicle = {
   model: string;
   year: number;
   type: string;
-  status: "AVAILABLE" | "ON_TRIP" | "IN_SHOP" | "RETIRED";
+  status: 'AVAILABLE' | 'ON_TRIP' | 'IN_SHOP' | 'RETIRED';
   mileage: number;
   capacity: number;
   acquisitionCost: number;
@@ -84,54 +93,62 @@ export type Vehicle = {
   healthScore: number;
 };
 
-const fetcher = (url: string) => fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(res => res.json());
+const fetcher = (url: string) =>
+  fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(
+    (res) => res.json()
+  );
 
 export default function Fleet() {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [user, setUser] = useState<{name: string; role: string} | null>(null);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
   React.useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (e) {}
     }
   }, []);
 
-  const { data: vehicles, mutate: mutateVehicles, isLoading } = useSWR<Vehicle[]>('/api/vehicles', fetcher);
+  const {
+    data: vehicles,
+    mutate: mutateVehicles,
+    isLoading,
+  } = useSWR<Vehicle[]>('/api/vehicles', fetcher);
 
   const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  
+
   const [formData, setFormData] = useState<Partial<Vehicle>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState("");
+  const [formError, setFormError] = useState('');
 
   const handleOpenAddDialog = () => {
     setSelectedVehicle(null);
     setFormData({
-      registration: "",
-      make: "",
-      model: "",
+      registration: '',
+      make: '',
+      model: '',
       year: 2024,
-      type: "",
-      status: "AVAILABLE",
+      type: '',
+      status: 'AVAILABLE',
       mileage: 0,
       capacity: 0,
       acquisitionCost: 0,
-      region: "",
+      region: '',
     });
-    setFormError("");
+    setFormError('');
     setIsVehicleDialogOpen(true);
   };
 
   const handleOpenEditDialog = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
     setFormData(vehicle);
-    setFormError("");
+    setFormError('');
     setIsVehicleDialogOpen(true);
   };
 
@@ -143,17 +160,17 @@ export default function Fleet() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setFormError("");
+    setFormError('');
 
-    const method = selectedVehicle ? "PUT" : "POST";
-    const url = selectedVehicle ? `/api/vehicles/${selectedVehicle.id}` : "/api/vehicles";
+    const method = selectedVehicle ? 'PUT' : 'POST';
+    const url = selectedVehicle ? `/api/vehicles/${selectedVehicle.id}` : '/api/vehicles';
 
     try {
       const res = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(formData),
       });
@@ -161,13 +178,14 @@ export default function Fleet() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Failed to save vehicle");
+        throw new Error(data.message || 'Failed to save vehicle');
       }
 
       toast.success(`Vehicle ${selectedVehicle ? 'updated' : 'added'} successfully`);
       setIsVehicleDialogOpen(false);
       mutateVehicles();
       mutate('/api/dashboard');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setFormError(error.message);
     } finally {
@@ -179,19 +197,20 @@ export default function Fleet() {
     if (!selectedVehicle) return;
     try {
       const res = await fetch(`/api/vehicles/${selectedVehicle.id}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Failed to archive vehicle");
+        throw new Error(data.message || 'Failed to archive vehicle');
       }
 
-      toast.success("Vehicle archived successfully");
+      toast.success('Vehicle archived successfully');
       setIsDeleteDialogOpen(false);
       mutateVehicles();
       mutate('/api/dashboard');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -200,22 +219,23 @@ export default function Fleet() {
   const handleStatusChange = async (vehicleId: string, newStatus: string) => {
     try {
       const res = await fetch(`/api/vehicles/${vehicleId}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ status: newStatus }),
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Failed to update status");
+        throw new Error(data.message || 'Failed to update status');
       }
-      
-      toast.success("Status updated");
+
+      toast.success('Status updated');
       mutateVehicles();
       mutate('/api/dashboard');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -224,36 +244,45 @@ export default function Fleet() {
   const columns = useMemo<ColumnDef<Vehicle>[]>(() => {
     const cols: ColumnDef<Vehicle>[] = [
       {
-        accessorKey: "registration",
-        header: "Registration",
-        cell: ({ row }) => <div className="font-medium text-primary">{row.getValue("registration")}</div>,
+        accessorKey: 'registration',
+        header: 'Registration',
+        cell: ({ row }) => (
+          <div className="font-medium text-primary">{row.getValue('registration')}</div>
+        ),
       },
       {
-        accessorKey: "make",
-        header: "Make & Model",
-        cell: ({ row }) => <div>{row.original.make} {row.original.model}</div>,
+        accessorKey: 'make',
+        header: 'Make & Model',
+        cell: ({ row }) => (
+          <div>
+            {row.original.make} {row.original.model}
+          </div>
+        ),
       },
       {
-        accessorKey: "type",
-        header: "Type",
+        accessorKey: 'type',
+        header: 'Type',
       },
       {
-        accessorKey: "region",
-        header: "State",
+        accessorKey: 'region',
+        header: 'State',
       },
       {
-        accessorKey: "status",
-        header: "Status",
+        accessorKey: 'status',
+        header: 'Status',
         cell: ({ row }) => {
-          const status = row.getValue("status") as string;
+          const status = row.getValue('status') as string;
           return (
-            <Badge 
+            <Badge
               variant="secondary"
               className={
-                status === "AVAILABLE" ? "bg-success/10 text-success hover:bg-success/20" :
-                status === "ON_TRIP" ? "bg-info/10 text-info hover:bg-info/20" :
-                status === "IN_SHOP" ? "bg-warning/10 text-warning hover:bg-warning/20" :
-                "bg-muted text-muted-foreground hover:bg-muted/80"
+                status === 'AVAILABLE'
+                  ? 'bg-success/10 text-success hover:bg-success/20'
+                  : status === 'ON_TRIP'
+                    ? 'bg-info/10 text-info hover:bg-info/20'
+                    : status === 'IN_SHOP'
+                      ? 'bg-warning/10 text-warning hover:bg-warning/20'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }
             >
               {status}
@@ -262,25 +291,37 @@ export default function Fleet() {
         },
       },
       {
-        accessorKey: "mileage",
-        header: "Odometer",
-        cell: ({ row }) => <div>{((row.getValue("mileage") as number) || 0).toLocaleString()} km</div>,
+        accessorKey: 'mileage',
+        header: 'Odometer',
+        cell: ({ row }) => (
+          <div>{((row.getValue('mileage') as number) || 0).toLocaleString()} km</div>
+        ),
       },
       {
-        accessorKey: "capacity",
-        header: "Capacity",
-        cell: ({ row }) => <div>{((row.getValue("capacity") as number) || 0).toLocaleString()} kg</div>,
+        accessorKey: 'capacity',
+        header: 'Capacity',
+        cell: ({ row }) => (
+          <div>{((row.getValue('capacity') as number) || 0).toLocaleString()} kg</div>
+        ),
       },
       {
-        accessorKey: "acquisitionCost",
-        header: "Acquisition Cost",
-        cell: ({ row }) => <div>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format((row.getValue("acquisitionCost") as number) || 0)}</div>,
-      }
+        accessorKey: 'acquisitionCost',
+        header: 'Acquisition Cost',
+        cell: ({ row }) => (
+          <div>
+            {new Intl.NumberFormat('en-IN', {
+              style: 'currency',
+              currency: 'INR',
+              maximumFractionDigits: 0,
+            }).format((row.getValue('acquisitionCost') as number) || 0)}
+          </div>
+        ),
+      },
     ];
 
     if (user?.role !== 'FINANCIAL_ANALYST') {
       cols.push({
-        id: "actions",
+        id: 'actions',
         enableHiding: false,
         cell: ({ row }) => {
           const vehicle = row.original;
@@ -300,28 +341,43 @@ export default function Fleet() {
                     <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
                       <DropdownMenuSubContent>
-                        <DropdownMenuItem onClick={() => handleStatusChange(vehicle.id, 'AVAILABLE')}>AVAILABLE</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(vehicle.id, 'ON_TRIP')}>ON_TRIP</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(vehicle.id, 'IN_SHOP')}>IN_SHOP</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusChange(vehicle.id, 'RETIRED')}>RETIRED</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleStatusChange(vehicle.id, 'AVAILABLE')}
+                        >
+                          AVAILABLE
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(vehicle.id, 'ON_TRIP')}>
+                          ON_TRIP
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(vehicle.id, 'IN_SHOP')}>
+                          IN_SHOP
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(vehicle.id, 'RETIRED')}>
+                          RETIRED
+                        </DropdownMenuItem>
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleOpenDeleteDialog(vehicle)} className="text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  onClick={() => handleOpenDeleteDialog(vehicle)}
+                  className="text-destructive focus:text-destructive"
+                >
                   <Trash2 className="mr-2 h-4 w-4" /> Archive Vehicle
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )
+          );
         },
       });
     }
-    
+
     return cols;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: Array.isArray(vehicles) ? vehicles : [],
     columns,
@@ -338,23 +394,24 @@ export default function Fleet() {
     initialState: {
       pagination: {
         pageSize: 10,
-      }
-    }
+      },
+    },
   });
 
   const handleExportPDF = () => {
     if (!vehicles || vehicles.length === 0) return;
     exportToPDF({
-      title: "Fleet Registry",
-      filename: "fleet_registry.pdf",
+      title: 'Fleet Registry',
+      filename: 'fleet_registry.pdf',
       headers: ['Registration', 'Make & Model', 'Type', 'State', 'Status'],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: vehicles.map((v: any) => [
         v.registration,
         `${v.make} ${v.model}`,
         v.type,
         v.region,
-        v.status
-      ])
+        v.status,
+      ]),
     });
   };
 
@@ -363,7 +420,7 @@ export default function Fleet() {
       <Head>
         <title>Fleet | TransitOps</title>
       </Head>
-      
+
       <div className="flex-1 space-y-8 p-1 sm:p-4">
         {/* Classy Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border/60">
@@ -389,14 +446,16 @@ export default function Fleet() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search registration, make, model, state..."
-                value={globalFilter ?? ""}
+                value={globalFilter ?? ''}
                 onChange={(e) => setGlobalFilter(e.target.value)}
                 className="pl-9 bg-muted/50"
               />
             </div>
-            
+
             <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="outline" className="ml-auto w-full sm:w-auto" />}>
+              <DropdownMenuTrigger
+                render={<Button variant="outline" className="ml-auto w-full sm:w-auto" />}
+              >
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
                 View
                 <ChevronDown className="ml-2 h-4 w-4" />
@@ -415,7 +474,7 @@ export default function Fleet() {
                       >
                         {column.id}
                       </DropdownMenuCheckboxItem>
-                    )
+                    );
                   })}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -431,32 +490,31 @@ export default function Fleet() {
                         <TableHead key={header.id} className="whitespace-nowrap">
                           {header.isPlaceholder
                             ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                            : flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHead>
-                      )
+                      );
                     })}
                   </TableRow>
                 ))}
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  Array(5).fill(0).map((_, i) => (
-                    <TableRow key={`skeleton-${i}`}>
-                      {table.getVisibleFlatColumns().map((col) => (
-                        <TableCell key={col.id} className="whitespace-nowrap">
-                          <Skeleton className="h-5 w-full max-w-[100px]" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  Array(5)
+                    .fill(0)
+                    .map((_, i) => (
+                      <TableRow key={`skeleton-${i}`}>
+                        {table.getVisibleFlatColumns().map((col) => (
+                          <TableCell key={col.id} className="whitespace-nowrap">
+                            <Skeleton className="h-5 w-full max-w-[100px]" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
                 ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
+                      data-state={row.getIsSelected() && 'selected'}
                       className="hover:bg-muted/50 transition-colors"
                     >
                       {row.getVisibleCells().map((cell) => (
@@ -476,7 +534,7 @@ export default function Fleet() {
               </TableBody>
             </Table>
           </div>
-          
+
           <div className="flex items-center justify-end space-x-2 p-4 border-t border-border">
             <Button
               variant="outline"
@@ -504,35 +562,39 @@ export default function Fleet() {
           <DialogHeader>
             <DialogTitle>{selectedVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}</DialogTitle>
             <DialogDescription>
-              {selectedVehicle ? 'Update details for this vehicle in the fleet.' : 'Register a new vehicle into the system.'}
+              {selectedVehicle
+                ? 'Update details for this vehicle in the fleet.'
+                : 'Register a new vehicle into the system.'}
             </DialogDescription>
           </DialogHeader>
-          
+
           <form onSubmit={handleFormSubmit} className="space-y-4 py-4">
             {formError && (
               <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-md border border-destructive/20">
                 {formError}
               </div>
             )}
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="registration">Registration No. (e.g., KA01AB4587)</Label>
-                <Input 
-                  id="registration" 
-                  required 
+                <Input
+                  id="registration"
+                  required
                   pattern="^[A-Za-z]{2}[0-9]{2}[A-Za-z]{1,2}[0-9]{4}$"
                   title="Indian Vehicle Registration (e.g., KA01AB4587)"
-                  value={formData.registration || ""}
-                  onChange={(e) => setFormData({...formData, registration: e.target.value.toUpperCase()})}
+                  value={formData.registration || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, registration: e.target.value.toUpperCase() })
+                  }
                   placeholder="KA01AB4587"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Vehicle Type</Label>
-                <Select 
-                  value={formData.type} 
-                  onValueChange={(val) => setFormData({...formData, type: val as string})}
+                <Select
+                  value={formData.type}
+                  onValueChange={(val) => setFormData({ ...formData, type: val as string })}
                 >
                   <SelectTrigger id="type">
                     <SelectValue placeholder="Select type" />
@@ -551,21 +613,21 @@ export default function Fleet() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="make">Manufacturer (Make)</Label>
-                <Input 
-                  id="make" 
-                  required 
-                  value={formData.make || ""}
-                  onChange={(e) => setFormData({...formData, make: e.target.value})}
+                <Input
+                  id="make"
+                  required
+                  value={formData.make || ''}
+                  onChange={(e) => setFormData({ ...formData, make: e.target.value })}
                   placeholder="e.g. Tata"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="model">Model</Label>
-                <Input 
-                  id="model" 
-                  required 
-                  value={formData.model || ""}
-                  onChange={(e) => setFormData({...formData, model: e.target.value})}
+                <Input
+                  id="model"
+                  required
+                  value={formData.model || ''}
+                  onChange={(e) => setFormData({ ...formData, model: e.target.value })}
                   placeholder="e.g. Ace Gold"
                 />
               </div>
@@ -574,32 +636,41 @@ export default function Fleet() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="capacity">Capacity (kg)</Label>
-                <Input 
-                  id="capacity" 
+                <Input
+                  id="capacity"
                   type="number"
-                  required 
-                  value={formData.capacity || ""}
-                  onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value) || 0})}
+                  required
+                  value={formData.capacity || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, capacity: parseInt(e.target.value) || 0 })
+                  }
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="mileage">Odometer (km)</Label>
-                <Input 
-                  id="mileage" 
+                <Input
+                  id="mileage"
                   type="number"
-                  required 
-                  value={formData.mileage || ""}
-                  onChange={(e) => setFormData({...formData, mileage: parseInt(e.target.value) || 0})}
+                  required
+                  value={formData.mileage || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, mileage: parseInt(e.target.value) || 0 })
+                  }
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="year">Year</Label>
-                <Input 
-                  id="year" 
+                <Input
+                  id="year"
                   type="number"
-                  required 
-                  value={formData.year || ""}
-                  onChange={(e) => setFormData({...formData, year: parseInt(e.target.value) || new Date().getFullYear()})}
+                  required
+                  value={formData.year || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      year: parseInt(e.target.value) || new Date().getFullYear(),
+                    })
+                  }
                 />
               </div>
             </div>
@@ -607,19 +678,21 @@ export default function Fleet() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="acquisitionCost">Acquisition Cost (₹)</Label>
-                <Input 
-                  id="acquisitionCost" 
+                <Input
+                  id="acquisitionCost"
                   type="number"
-                  required 
-                  value={formData.acquisitionCost || ""}
-                  onChange={(e) => setFormData({...formData, acquisitionCost: parseInt(e.target.value) || 0})}
+                  required
+                  value={formData.acquisitionCost || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, acquisitionCost: parseInt(e.target.value) || 0 })
+                  }
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="region">Region (State)</Label>
-                <Select 
-                  value={formData.region} 
-                  onValueChange={(val) => setFormData({...formData, region: val as string})}
+                <Select
+                  value={formData.region}
+                  onValueChange={(val) => setFormData({ ...formData, region: val as string })}
                 >
                   <SelectTrigger id="region">
                     <SelectValue placeholder="Select State" />
@@ -642,11 +715,16 @@ export default function Fleet() {
             </div>
 
             <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => setIsVehicleDialogOpen(false)} disabled={isSubmitting}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsVehicleDialogOpen(false)}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : selectedVehicle ? "Update Vehicle" : "Add Vehicle"}
+                {isSubmitting ? 'Saving...' : selectedVehicle ? 'Update Vehicle' : 'Add Vehicle'}
               </Button>
             </DialogFooter>
           </form>
@@ -659,12 +737,13 @@ export default function Fleet() {
           <AlertDialogHeader>
             <AlertDialogTitle>Archive Vehicle?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will archive the vehicle {selectedVehicle?.registration}. It will no longer appear in active lists.
+              This will archive the vehicle {selectedVehicle?.registration}. It will no longer
+              appear in active lists.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
                 handleArchive();

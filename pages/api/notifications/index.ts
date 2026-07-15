@@ -9,7 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   return requireAuth(async (req, res, user) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let expiringDrivers: any[] = [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let maintenanceVehicles: any[] = [];
       let pendingTrips = 0;
 
@@ -20,27 +22,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (['SAFETY_OFFICER', 'FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
         fetchPromises.push(
-          prisma.driver.findMany({
-            where: { licenseExpiry: { lte: thirtyDaysFromNow }, isArchived: false },
-            select: { id: true, name: true, licenseExpiry: true }
-          }).then(res => { expiringDrivers = res; })
+          prisma.driver
+            .findMany({
+              where: { licenseExpiry: { lte: thirtyDaysFromNow }, isArchived: false },
+              select: { id: true, name: true, licenseExpiry: true },
+            })
+            .then((res) => {
+              expiringDrivers = res;
+            })
         );
       }
 
       if (['FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
         fetchPromises.push(
-          prisma.vehicle.findMany({
-            where: { status: 'IN_SHOP' },
-            select: { id: true, registration: true }
-          }).then(res => { maintenanceVehicles = res; })
+          prisma.vehicle
+            .findMany({
+              where: { status: 'IN_SHOP' },
+              select: { id: true, registration: true },
+            })
+            .then((res) => {
+              maintenanceVehicles = res;
+            })
         );
       }
 
       if (['DISPATCHER', 'FLEET_MANAGER', 'ADMIN'].includes(user.role)) {
         fetchPromises.push(
-          prisma.trip.count({
-            where: { status: { in: ['DRAFT', 'ASSIGNED'] } }
-          }).then(res => { pendingTrips = res; })
+          prisma.trip
+            .count({
+              where: { status: { in: ['DRAFT', 'ASSIGNED'] } },
+            })
+            .then((res) => {
+              pendingTrips = res;
+            })
         );
       }
 
@@ -48,23 +62,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const notifications = [];
 
-      expiringDrivers.forEach(driver => {
+      expiringDrivers.forEach((driver) => {
         notifications.push({
           id: `driver-${driver.id}`,
           type: 'warning',
           title: 'License Expiring',
           description: `${driver.name}'s license is expiring on ${new Date(driver.licenseExpiry).toLocaleDateString()}`,
-          date: new Date()
+          date: new Date(),
         });
       });
 
-      maintenanceVehicles.forEach(vehicle => {
+      maintenanceVehicles.forEach((vehicle) => {
         notifications.push({
           id: `vehicle-${vehicle.id}`,
           type: 'info',
           title: 'Vehicle in Maintenance',
           description: `Vehicle ${vehicle.registration} is currently in the shop.`,
-          date: new Date()
+          date: new Date(),
         });
       });
 
@@ -74,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           title: 'Pending Trips',
           description: `You have ${pendingTrips} trips waiting to be dispatched.`,
           type: 'alert',
-          date: new Date()
+          date: new Date(),
         });
       }
 

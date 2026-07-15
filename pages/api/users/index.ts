@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'DELETE') {
       try {
         const { id } = req.body;
-        
+
         if (!id) {
           return res.status(400).json({ message: 'User ID is required' });
         }

@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const email = 'sachin23bcs64@iiitkottayam.ac.in';
-  
+
   try {
     await prisma.user.delete({ where: { email } });
     console.log(`Successfully deleted ${email} from the database.`);
@@ -13,4 +13,6 @@ async function main() {
   }
 }
 
-main().catch(console.error).finally(() => prisma.$disconnect());
+main()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());

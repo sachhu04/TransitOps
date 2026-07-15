@@ -50,11 +50,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const targetUser = await prisma.user.findUnique({ where: { email } });
-    
+
     // We always return 200 to prevent User Enumeration, even if the user doesn't exist.
     if (!targetUser) {
-      return res.status(200).json({ 
-        message: 'If an account with that email exists, we have sent a password reset link to it.' 
+      return res.status(200).json({
+        message: 'If an account with that email exists, we have sent a password reset link to it.',
       });
     }
 

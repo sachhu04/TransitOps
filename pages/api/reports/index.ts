@@ -17,24 +17,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           fuelLogs: true,
           maintenance: true,
           trips: {
-            where: { status: 'COMPLETED' }
-          }
-        }
+            where: { status: 'COMPLETED' },
+          },
+        },
       });
 
-      const reports = vehicles.map(vehicle => {
+      const reports = vehicles.map((vehicle) => {
         const totalDistance = vehicle.trips.reduce((acc, trip) => acc + trip.distance, 0);
         const totalFuelLiters = vehicle.fuelLogs.reduce((acc, log) => acc + log.liters, 0);
         const fuelEfficiency = totalFuelLiters > 0 ? totalDistance / totalFuelLiters : 0;
-        
+
         const fuelCost = vehicle.fuelLogs.reduce((acc, log) => acc + log.cost, 0);
         const maintenanceCost = vehicle.maintenance.reduce((acc, log) => acc + log.cost, 0);
         const operationalCost = fuelCost + maintenanceCost;
-        
+
         // Assume revenue is a function of distance or a fixed rate. For hackathon, let's say 50 INR per km.
         // Wait, the UI has Indian locale reqs, and distance might be in km. Let's use 50 INR per distance unit.
-        const revenue = totalDistance * 50; 
-        
+        const revenue = totalDistance * 50;
+
         // Assume Acquisition cost is fixed or random for demo purposes unless added to model.
         // Let's use a fixed 1,500,000 INR (15 Lakhs) for ROI calculation.
         const acquisitionCost = vehicle.acquisitionCost || 1500000;
@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           maintenanceCost,
           operationalCost,
           revenue,
-          roi
+          roi,
         };
       });
 

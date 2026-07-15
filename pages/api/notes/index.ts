@@ -8,9 +8,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const notes = await prisma.shiftNote.findMany({
           orderBy: { createdAt: 'desc' },
-          take: 10
+          take: 10,
         });
         return res.status(200).json(notes);
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }
@@ -22,10 +23,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const note = await prisma.shiftNote.create({
           data: {
             content,
-            authorName: user.email.split('@')[0]
-          }
+            authorName: user.email.split('@')[0],
+          },
         });
         return res.status(201).json(note);
+        // eslint-disable-next-line unused-imports/no-unused-vars
       } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
       }

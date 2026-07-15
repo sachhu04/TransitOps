@@ -7,16 +7,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
+  // eslint-disable-next-line unused-imports/no-unused-vars
   return requireAuth(async (req, res, user) => {
     try {
       const { region, type, status } = req.query;
 
       // Base query for vehicles
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const vehicleWhere: any = {};
       if (type) vehicleWhere.type = type as string;
       if (status) vehicleWhere.status = status as string;
       if (region) vehicleWhere.region = region as string;
-      
+
       const [
         vehicleCounts,
         activeTrips,
@@ -24,15 +26,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         totalDistanceAgg,
         totalFuelAgg,
         totalMaintenanceCostAgg,
-        driverCounts
+        driverCounts,
       ] = await Promise.all([
         prisma.vehicle.groupBy({ by: ['status'], where: vehicleWhere, _count: { _all: true } }),
         prisma.trip.count({ where: { status: 'DISPATCHED', vehicle: vehicleWhere } }),
-        prisma.trip.count({ where: { status: { in: ['DRAFT', 'ASSIGNED'] }, vehicle: vehicleWhere } }),
-        prisma.trip.aggregate({ _sum: { distance: true }, where: { status: 'COMPLETED', vehicle: vehicleWhere } }),
-        prisma.fuelLog.aggregate({ _sum: { liters: true, cost: true }, where: { vehicle: vehicleWhere } }),
+        prisma.trip.count({
+          where: { status: { in: ['DRAFT', 'ASSIGNED'] }, vehicle: vehicleWhere },
+        }),
+        prisma.trip.aggregate({
+          _sum: { distance: true },
+          where: { status: 'COMPLETED', vehicle: vehicleWhere },
+        }),
+        prisma.fuelLog.aggregate({
+          _sum: { liters: true, cost: true },
+          where: { vehicle: vehicleWhere },
+        }),
         prisma.maintenanceLog.aggregate({ _sum: { cost: true }, where: { vehicle: vehicleWhere } }),
-        prisma.driver.groupBy({ by: ['status'], _count: { _all: true } })
+        prisma.driver.groupBy({ by: ['status'], _count: { _all: true } }),
       ]);
 
       let totalVehicles = 0;
@@ -63,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const totalDistance = totalDistanceAgg._sum.distance || 0;
       const totalFuel = totalFuelAgg._sum.liters || 0;
-      
+
       const metrics = {
         activeVehicles,
         availableVehicles,
@@ -77,7 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         totalDrivers,
         availableDrivers,
         offDutyDrivers,
-        suspendedDrivers
+        suspendedDrivers,
       };
 
       res.status(200).json(metrics);
