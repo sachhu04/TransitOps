@@ -66,14 +66,20 @@
 
 ## UI Showcase
 
-> **Note:** Replace the placeholder links below with actual screenshots of the application.
+> **Note:** Save your screenshots to a `docs/` folder in this repository, then replace the placeholder links below with the actual paths (e.g., `./docs/login-page.png`).
 
 <div align="center">
-  <img src="https://placehold.co/800x450/111111/FFFFFF/png?text=Dashboard+View" alt="Dashboard View" width="800"/>
+  <img src="./docs/login.png" alt="Login Page" width="800"/>
+  <p><em>Secure Authentication & Role-Based Login</em></p>
+
+  <img src="./docs/dashboard.png" alt="Dashboard View" width="800"/>
   <p><em>Main Operations Dashboard</em></p>
 
-  <img src="https://placehold.co/800x450/111111/FFFFFF/png?text=Advanced+Analytics+View" alt="Advanced Analytics" width="800"/>
+  <img src="./docs/analytics.png" alt="Advanced Analytics" width="800"/>
   <p><em>Advanced Analytics & Real-Time Reporting</em></p>
+
+  <img src="./docs/team-management.png" alt="Team Management & Invitations" width="800"/>
+  <p><em>Admin Settings & Secure Email Invitations</em></p>
 </div>
 
 ---
