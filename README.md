@@ -4,14 +4,13 @@
   <h3 align="center">Enterprise Fleet & Logistics Management Platform</h3>
 
   <p align="center">
-    <strong>Built for the Odoo Hackathon</strong>
-    <br />
-    <br />
     <a href="#overview">Overview</a>
     ·
     <a href="#features">Features</a>
     ·
     <a href="#tech-stack">Tech Stack</a>
+    ·
+    <a href="#ui-showcase">UI Showcase</a>
     ·
     <a href="#system-design">System Design</a>
     ·
@@ -23,7 +22,7 @@
 
 ## Overview
 
-**TransitOps** is a comprehensive, end-to-end Fleet and Logistics Management platform. Built for the Odoo Hackathon, it provides a centralized dashboard to seamlessly manage vehicles, drivers, trips, maintenance, and expenses with built-in Role-Based Access Control (RBAC). The platform features a premium, minimalist "Bento Grid" user interface designed for high-density data visualization and operational efficiency.
+**TransitOps** is a comprehensive, end-to-end Fleet and Logistics Management platform. It provides a centralized dashboard to seamlessly manage vehicles, drivers, trips, maintenance, and expenses with built-in Role-Based Access Control (RBAC). The platform features a premium, minimalist "Bento Grid" user interface designed for high-density data visualization and operational efficiency.
 
 ---
 
@@ -42,42 +41,40 @@
   <img src="https://img.shields.io/badge/Shadcn_UI-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="Shadcn UI" />
   <img src="https://img.shields.io/badge/Recharts-000000?style=for-the-badge&logo=react&logoColor=white" alt="Recharts" />
   <img src="https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest" />
-  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" alt="GitHub Actions" />
+</div>
+<br/>
+<div align="center">
+  <img src="https://github.com/sachhu04/TransitOps/actions/workflows/ci.yml/badge.svg" alt="CI Pipeline Status" />
 </div>
 
 ---
 
 ## Features
 
-**Premium Bento Grid Dashboard**  
-A high-performance, minimalist interface featuring advanced Recharts data visualizations, SVG linear gradients, and responsive grid layouts for optimal data consumption.
+- **Premium Bento Grid Dashboard:** A high-performance, minimalist interface featuring advanced Recharts data visualizations, SVG linear gradients, and responsive grid layouts for optimal data consumption.
+- **Enterprise Authentication & Invitations:** Secure email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database-level rate limiting.
+- **Production Email Infrastructure:** Automated server-to-server email dispatch using Google OAuth2 (Client ID & Refresh Token) to bypass cloud SMTP blocking heuristics on Vercel.
+- **Fleet Management:** Track vehicle status, health scores, mileage, and maintenance logs in real time.
+- **Driver Management:** Manage driver profiles, licenses, safety scores, and duty availability.
+- **Trip Lifecycle Management:** Dispatch, track, and complete trips with real-time status updates from DRAFT to COMPLETED.
+- **Maintenance & Fuel Logs:** Record maintenance costs, log fuel expenses, and track overall operational efficiency.
+- **Analytics & Reports:** Exportable comprehensive reports (PDF and CSV formats) for fuel efficiency, ROI, and top costliest vehicles.
+- **Role-Based Access Control (RBAC):** Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT. Advanced admin capabilities for permanent user deletion and team management.
+- **Production-Grade Testing & CI/CD:** Fully automated Continuous Integration pipeline via GitHub Actions. Features strict ESLint rules, Prettier formatting, TypeScript type-checking, and rapid Unit Testing using Vitest.
 
-**Enterprise Authentication & Invitations**  
-Secure email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database-level rate limiting.
+---
 
-**Production Email Infrastructure**  
-Automated server-to-server email dispatch using Google OAuth2 (Client ID & Refresh Token) to bypass cloud SMTP blocking heuristics on Vercel.
+## UI Showcase
 
-**Fleet Management**  
-Track vehicle status, health scores, mileage, and maintenance logs in real time.
+> **Note:** Replace the placeholder links below with actual screenshots of the application.
 
-**Driver Management**  
-Manage driver profiles, licenses, safety scores, and duty availability.
+<div align="center">
+  <img src="https://placehold.co/800x450/111111/FFFFFF/png?text=Dashboard+View" alt="Dashboard View" width="800"/>
+  <p><em>Main Operations Dashboard</em></p>
 
-**Trip Lifecycle Management**  
-Dispatch, track, and complete trips with real-time status updates from DRAFT to COMPLETED.
-
-**Maintenance & Fuel Logs**  
-Record maintenance costs, log fuel expenses, and track overall operational efficiency.
-
-**Analytics & Reports**  
-Exportable comprehensive reports (PDF format) for fuel efficiency, ROI, and top costliest vehicles.
-
-**Role-Based Access Control (RBAC)**  
-Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT. Advanced admin capabilities for permanent user deletion and team management.
-
-**Production-Grade Testing & CI/CD**  
-Fully automated Continuous Integration pipeline via GitHub Actions. Features strict ESLint rules, Prettier formatting, TypeScript type-checking, and rapid Unit Testing using Vitest.
+  <img src="https://placehold.co/800x450/111111/FFFFFF/png?text=Advanced+Analytics+View" alt="Advanced Analytics" width="800"/>
+  <p><em>Advanced Analytics & Real-Time Reporting</em></p>
+</div>
 
 ---
 
@@ -169,7 +166,7 @@ erDiagram
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (v20 or higher)
 - PostgreSQL database (or Supabase)
 
 ### 1. Environment Setup
@@ -183,7 +180,7 @@ Ensure you have a running PostgreSQL instance. Update the environment variables 
 ```env
 DATABASE_URL="postgresql://postgres:[PASSWORD]@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
 DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres"
-JWT_SECRET="supersecret_jwt_key_transitops_hackathon_2026"
+JWT_SECRET="supersecret_jwt_key_transitops_2026"
 
 # Email Configuration (Google OAuth2 for Nodemailer)
 EMAIL_USER="your-email@gmail.com"
