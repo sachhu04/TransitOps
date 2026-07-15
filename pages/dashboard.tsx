@@ -36,6 +36,10 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from 'recharts';
 
 export default function Dashboard() {
@@ -112,6 +116,12 @@ export default function Dashboard() {
     { name: 'Fri', revenue: 18900, cost: 12100 },
     { name: 'Sat', revenue: 9400, cost: 6300 },
     { name: 'Sun', revenue: 8100, cost: 5200 },
+  ];
+
+  const fleetStatusData = [
+    { name: 'Active', value: dashboardData?.activeVehicles || 0, color: '#3b82f6' },
+    { name: 'Available', value: dashboardData?.availableVehicles || 0, color: '#22c55e' },
+    { name: 'Maintenance', value: dashboardData?.maintenanceVehicles || 0, color: '#f59e0b' },
   ];
 
   const exportCSV = () => {
@@ -551,16 +561,121 @@ export default function Dashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="analytics" className="outline-none">
-            <Card className="h-[400px] flex items-center justify-center border-dashed">
-              <div className="text-center">
-                <Activity className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-50" />
-                <h3 className="text-lg font-medium">Advanced Analytics</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Detailed reporting view coming soon.
-                </p>
-              </div>
-            </Card>
+          <TabsContent value="analytics" className="outline-none space-y-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="lg:col-span-4 border-border/50 shadow-sm">
+                <CardHeader>
+                  <CardTitle>Revenue vs Operational Cost</CardTitle>
+                  <CardDescription>7-day rolling performance</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[350px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={revenueData}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="hsl(var(--border))"
+                      />
+                      <XAxis
+                        dataKey="name"
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `$${value}`}
+                      />
+                      <RechartsTooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--background))',
+                          borderColor: 'hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#3b82f6"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorRev)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="cost"
+                        stroke="#ef4444"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorCost)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="lg:col-span-3 border-border/50 shadow-sm">
+                <CardHeader>
+                  <CardTitle>Fleet Utilization</CardTitle>
+                  <CardDescription>Current live status of all vehicles</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[350px] flex items-center justify-center">
+                  {dashboardData ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={fleetStatusData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={80}
+                          outerRadius={120}
+                          paddingAngle={2}
+                          dataKey="value"
+                          stroke="hsl(var(--background))"
+                          strokeWidth={2}
+                        >
+                          {fleetStatusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                          itemStyle={{ color: 'hsl(var(--foreground))' }}
+                        />
+                        <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <Activity className="w-8 h-8 mb-2 opacity-50" />
+                      <p>Loading fleet data...</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="reports" className="outline-none">
