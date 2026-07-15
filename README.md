@@ -41,6 +41,8 @@
   <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white" alt="JWT" />
   <img src="https://img.shields.io/badge/Shadcn_UI-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="Shadcn UI" />
   <img src="https://img.shields.io/badge/Recharts-000000?style=for-the-badge&logo=react&logoColor=white" alt="Recharts" />
+  <img src="https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" alt="GitHub Actions" />
 </div>
 
 ---
@@ -73,6 +75,9 @@ Exportable comprehensive reports (PDF format) for fuel efficiency, ROI, and top 
 
 **Role-Based Access Control (RBAC)**  
 Fine-grained permissions for Fleet Managers, Dispatchers, Safety Officers, and Financial Analysts using JWT. Advanced admin capabilities for permanent user deletion and team management.
+
+**Production-Grade Testing & CI/CD**  
+Fully automated Continuous Integration pipeline via GitHub Actions. Features strict ESLint rules, Prettier formatting, TypeScript type-checking, and rapid Unit Testing using Vitest.
 
 ---
 
@@ -219,6 +224,18 @@ Run the development server:
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser to view the application.
+
+### 5. Running Tests & Code Quality Checks
+
+This repository is maintained with a strict CI pipeline. You can run the quality checks locally:
+
+```bash
+# Run the Vitest unit testing suite
+npm run test
+
+# Run the full CI sequence (Format, Lint, Typecheck, Test, Build)
+npm run ci
+```
 
 ---
 
