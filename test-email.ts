@@ -6,8 +6,10 @@ sendEmail({
   to: 'test@example.com',
   subject: 'Test Email',
   html: '<p>Test</p>',
-}).then((res) => {
-  console.log('Result:', res);
-}).catch((err) => {
-  console.error('Error:', err);
-});
+})
+  .then((res) => {
+    console.log('Result:', res);
+  })
+  .catch((err) => {
+    console.error('Error:', err);
+  });

@@ -25,15 +25,10 @@ export const sendEmail = async ({
       message: html,
     };
 
-    const info = await send(
-      SERVICE_ID,
-      TEMPLATE_ID,
-      templateParams,
-      {
-        publicKey: PUBLIC_KEY,
-        privateKey: PRIVATE_KEY,
-      }
-    );
+    const info = await send(SERVICE_ID, TEMPLATE_ID, templateParams, {
+      publicKey: PUBLIC_KEY,
+      privateKey: PRIVATE_KEY,
+    });
     return { success: true, info };
   } catch (error) {
     console.error('EmailJS error:', error);
