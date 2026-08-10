@@ -53,7 +53,7 @@
 
 - **Premium Bento Grid Dashboard:** A high-performance, minimalist interface featuring advanced Recharts data visualizations, SVG linear gradients, and responsive grid layouts for optimal data consumption.
 - **Enterprise Authentication & Invitations:** Secure email invitations with isolated database schemas. Self-serve forgot password flow protected by cryptographic token hashing and strict database-level rate limiting.
-- **Production Email Infrastructure:** Automated server-to-server email dispatch using Google OAuth2 (Client ID & Refresh Token) to bypass cloud SMTP blocking heuristics on Vercel.
+- **Production Email Infrastructure:** Automated server-to-server email dispatch using EmailJS (`@emailjs/nodejs`) to bypass cloud SMTP blocking heuristics and ensure reliable delivery of invitations and password resets.
 - **Fleet Management:** Track vehicle status, health scores, mileage, and maintenance logs in real time.
 - **Driver Management:** Manage driver profiles, licenses, safety scores, and duty availability.
 - **Trip Lifecycle Management:** Dispatch, track, and complete trips with real-time status updates from DRAFT to COMPLETED.
@@ -188,11 +188,11 @@ DATABASE_URL="postgresql://postgres:[PASSWORD]@aws-1-ap-northeast-2.pooler.supab
 DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres"
 JWT_SECRET="supersecret_jwt_key_transitops_2026"
 
-# Email Configuration (Google OAuth2 for Nodemailer)
-EMAIL_USER="your-email@gmail.com"
-GMAIL_CLIENT_ID="your_google_client_id"
-GMAIL_CLIENT_SECRET="your_google_client_secret"
-GMAIL_REFRESH_TOKEN="your_google_refresh_token"
+# Email Configuration (EmailJS Server-Side)
+EMAILJS_SERVICE_ID="your_emailjs_service_id"
+EMAILJS_TEMPLATE_ID="your_emailjs_template_id"
+EMAILJS_PUBLIC_KEY="your_emailjs_public_key"
+EMAILJS_PRIVATE_KEY="your_emailjs_private_key"
 ```
 
 ### 2. Database Initialization

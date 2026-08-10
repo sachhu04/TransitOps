@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@emailjs/nodejs": "^5.0.2",
     "@hookform/resolvers": "^5.4.0",
     "@prisma/client": "^5.22.0",
     "@tanstack/react-table": "^8.21.3",
