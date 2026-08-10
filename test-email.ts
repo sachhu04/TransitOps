@@ -1,4 +1,4 @@
-import { sendEmail } from './TransitOps/lib/email';
+import { sendEmail } from './lib/email';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -7,9 +7,9 @@ sendEmail({
   subject: 'Test Email',
   html: '<p>Test</p>',
 })
-  .then((res) => {
+  .then((res: any) => {
     console.log('Result:', res);
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.error('Error:', err);
   });
